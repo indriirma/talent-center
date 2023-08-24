@@ -8,8 +8,10 @@ import LoginLayout from 'layouts/LoginLayout';
 import DashboardLayout from 'layouts/DashboardLayout';
 
 import Customer from './customer';
+// import Client from './client';
 
 import { LightTheme } from 'resource/themes';
+import LandingPage from './client/landing-page/Modals';
 
 const routes: SecurableRoute[] = [
   {
@@ -19,6 +21,20 @@ const routes: SecurableRoute[] = [
   {
     path: 'customer',
     element: <Customer />,
+  },
+  {
+    path: 'client',
+    element: (
+      <ThemeProvider theme={LightTheme}>
+        <Outlet/>
+      </ThemeProvider>
+    ),
+    children:[
+      {
+        index: true,
+        element:<LandingPage/>,
+      }, 
+    ]
   },
 
   {
