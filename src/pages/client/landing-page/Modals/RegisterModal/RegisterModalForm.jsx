@@ -1,20 +1,15 @@
-import {useForm,Controller} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Typography,Box,Button,Radio,RadioGroup,
     Dialog, FormControlLabel,Checkbox, DialogTitle,DialogContent, IconButton, 
-    Grid, TextField, InputAdornment,Link,FormControl,FormLabel, Autocomplete, FormHelperText} from "@mui/material";  
+    Grid, TextField, InputAdornment,Link,FormControl,FormLabel, MenuItem, FormHelperText, Select, InputLabel} from "@mui/material";  
 import { useState,useEffect } from 'react';  
 import CloseIcon from "@mui/icons-material/Close";
 import GoogleIcon from '@mui/icons-material/Google';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
-import {LocalizationProvider,DatePicker} from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';  
 
-const RegisterModalForm=({regOpen,regClose})=>{
-    let clientPositionId=[{label:'HRD',id:1},
-    {label: 'Manager', id:2}];
+const RegisterModalForm=({regOpen,regClose})=>{ 
     const validation = Yup.object().shape({
         userName:Yup.string()
         .required('Username is required')
@@ -31,14 +26,14 @@ const RegisterModalForm=({regOpen,regClose})=>{
         .matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,'Email is invalid'),
         password:Yup.string()
         .required('Password is required')
-        .min(8,'x')
-        .matches(/^(?=.*\d)(?=.*[0-9])(?=.*[a-zA-Z]).{0,255}$/,'n'),
+        .min(8,'Password is at least 8 characters long')
+        .matches(/^(?=.*\d)(?=.*[0-9])(?=.*[a-zA-Z]).{0,255}$/,'Password contains at least one letter and one number'),
         confirmPassword:Yup.string()
         .required('Retype Password is required')
         .oneOf([Yup.ref('password'),null],'Retype Password does not match'),
         sex:Yup.string()
         .required('Gender is required'),
-        birthDate:Yup.date()
+        birthdate:Yup.date()
         .required('Birthdate is required'),
         clientPositionId:Yup.string()
         .required('Position is required'),
@@ -48,20 +43,48 @@ const RegisterModalForm=({regOpen,regClose})=>{
         .required('Agency Address is required')        
     });
     const{register,handleSubmit,formState:{errors},reset}=useForm({
-       resolver:yupResolver(validation)
-    }); 
-     
-    const onSubmit = data =>{
+       resolver:yupResolver(validation)},{defaultValue:{
+        userName:"test1",
+        firstName:"test2",
+        lastName:"test3",
+        email:"test@gmail.com",
+        password:"testing123", 
+        sex:"L",
+        birthdate:"1999-10-10",
+        clientPositionId:"1",
+        agencyName:"PT test",
+        agencyAddress:"Bandoeng",
+    }}); 
+    // const [state,setState] = useState({
+    //     userId:"1",
+    //     id:"1",
+    //     title:"irir",
+    //     body:"irir"
+    // });
+    const url = "http://localhost:8080/api/user-management/users/register";
+    // const url = "https://jsonplaceholder.typicode.com/posts"; 
+    const onSubmit = data =>{  
         console.log(JSON.stringify(data,null,2));
-        // fetch('http://localhost:8080/api/user-management/users/register', {
-        //     method: 'POST',
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(data)
-        //     }).then(() => {
-        //     console.log('success');
-        //     reset();
-        //     alert('data berhasil didaftarkan');
-        // })
+        alert('good');
+        fetch(url, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userName:data.userName,
+                firstName:data.firstName,
+                lastName:data.lastName,
+                email:data.email,
+                password:data.password,
+                sex:data.sex,
+                birthdate:data.birthdate.toISOString().split("T")[0],
+                clientPositionId:data.clientPositionId,
+                agencyName:data.agencyName,
+                agencyAddress:data.agencyAddress
+            })
+            }).then(() => {             
+           // reset();
+            alert('data berhasil didaftarkan');
+        })
     };
     const [isModOpen,setIsRegMoOpen]=useState(regOpen);
     const [showPassword, setShowPassword] = useState(false);
@@ -86,7 +109,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
         
     return(
         isModOpen &&
-        <Dialog open={isModOpen} onClose={closeRegisterModal} fullWidth maxWidth="sm"  inputProps={{
+        <Dialog open={isModOpen} onClose={closeRegisterModal} fullwidth maxWidth="sm"  inputprops={{
             style: {borderRadius: "10px"}
             }}>
         <DialogTitle>
@@ -108,7 +131,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                     <TextField
                         sx={{width: 1, display: 'flex', pr: 1}}
-                        inputProps={{
+                        inputprops={{
                             style:{
                                 borderRadius:"10px"
                             }
@@ -117,7 +140,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         size="small"
                         required
                         type="userName" 
-                        fullWidth 
+                        fullwidth 
                         placeholder="Username"
                         autoFocus 
                         variant="outlined"
@@ -139,7 +162,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         {...register("firstName")}
                         error={Boolean(errors.firstName)}
                         helperText={errors.firstName?.message}
-                        inputProps={{
+                        inputprops={{
                             style: {
                                 borderRadius: "10px",
                             }
@@ -159,7 +182,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         {...register("lastName")}
                         error={Boolean(errors.lastName)}
                         helperText={errors.lastName?.message}
-                        inputProps={{
+                        inputprops={{
                             style: {
                                 borderRadius: "10px",
                             }
@@ -169,7 +192,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                 <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                     <TextField
                         sx={{width: 1, display: 'flex', pr: 1}}
-                        inputProps={{
+                        inputprops={{
                             style:{
                                 borderRadius:"10px"
                             }
@@ -178,7 +201,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         size="small"
                         required
                         type="email" 
-                        fullWidth 
+                        fullwidth 
                         placeholder="E-mail"
                         autoFocus
                         variant="outlined"
@@ -193,7 +216,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         id="password"
                         size="small"
                         required 
-                        fullWidth  
+                        fullwidth  
                         placeholder="Password"
                         autoFocus
                         variant="outlined"
@@ -201,11 +224,11 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         error={Boolean(errors.password)}
                         helperText={errors.password?.message}
                         type={showPassword ? 'text' : 'password'}
-                        inputProps={{
+                        inputprops={{
                             style:{
                                 borderRadius:"10px"
                             },
-                            endAdornment: (
+                            endadornment: (
                             <InputAdornment position="end">
                                 <IconButton
                                 aria-label="visibility-button-pass"
@@ -220,26 +243,26 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     />
                 </Grid>                                
             <Grid>                
-            <FormControlLabel
-                sx={{ml:'0.5rem',
-                fontFamily: 'Poppins',
-                fontSize:5                               
-            }}                                 
+                <FormControlLabel
+                    sx={{ml:'0.5rem',
+                    fontFamily: 'Poppins',
+                    fontSize:5                               
+                }}                                 
                 label="Password is at least 8 characters long"
                 control={                                        
-                    <Checkbox checked={!errors.password?true:false}  
+                    <Checkbox checked  
                     sx={{width:100}} disabled />
                 }
                 />
                 <Grid item mt={0} />
-            <FormControlLabel
-                sx={{ml:'0.5rem',
-                fontFamily: 'Poppins',
-                fontSize:5
-            }}
+                <FormControlLabel
+                    sx={{ml:'0.5rem',
+                    fontFamily: 'Poppins',
+                    fontSize:5
+                }}
                 label="Password contains at least one letter and one number"
                 control={
-                    <Checkbox checked={!errors.password?true:false} 
+                    <Checkbox checked 
                     sx={{width:100}} disabled />
                 }
                 />
@@ -250,7 +273,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         sx={{width: 1, display: 'flex', pr: 1}}
                         id="confirmPassword" 
                         required
-                        fullWidth 
+                        fullwidth 
                         placeholder="Type your password again"
                         size="small" 
                         autoFocus
@@ -259,11 +282,11 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         error={Boolean(errors.confirmPassword)}
                         helperText={errors.confirmPassword?.message}
                         type={showConfirmPassword ? 'text' : 'password'}
-                        inputProps={{
+                        inputprops={{
                             style:{
                                 borderRadius:"10px"
                             },
-                            endAdornment: (
+                            endadornment: (
                             <InputAdornment position="end">
                                 <IconButton
                                 aria-label="visibility-button"
@@ -285,66 +308,68 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     <RadioGroup   
                         error={Boolean(errors.sex)}                     
                         row                        
-                        fullWidth
+                        fullwidth
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="sex-radio-button" >
                         <FormControlLabel value="L" control={<Radio {...register('sex',validation.sex)} />} label="Male"/>                        
                            <Grid item mr={2} />
-                        <FormControlLabel value="M" control={<Radio {...register('sex',validation.sex)} />} label="Female"/>                            
+                        <FormControlLabel value="P" control={<Radio {...register('sex',validation.sex)} />} label="Female"/>                            
                     </RadioGroup>
                 </FormControl>
             </Grid>
                 <FormHelperText style={{color:'#d32f2f'}}>{errors.sex?.message}</FormHelperText>
             <Grid item mt={1} />
-            <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                        <DatePicker                         
-                        sx={{width: 1, display: 'flex', pr: 1}}
-                        label="Birthdate"  
-                        required
-                        slots={{
-                            toolbar:()=>(
-                                <TextField 
-                                {...register('birthDate',validation.birthDate)}  
-                                    error={Boolean(errors.birthDate)}             
-                                    helperText={errors.birthDate?.message} 
-                                    size = "small"
-                                    fullWidth
-                                />
-                            )
-                        }} 
-                        />
-                    </DemoContainer>
-                </LocalizationProvider>
-            </Grid> 
+            <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>  
+            <FormControl >
+                <FormLabel>Birthdate</FormLabel>
+                <TextField
+                    {...register('birthdate',validation.birthdate)}
+                    sx={{width: 1, display: 'flex', pr: 1}} 
+                    type="date"
+                    size = "small" 
+                    required 
+                    id = "birthdate"
+                    fullWidth                       
+                    error={Boolean(errors.birthdate)}
+                    helperText={errors.birthdate?.message}
+                />
+            </FormControl>
+            </Grid>  
             <Grid item mt={1} />
             <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                <Autocomplete 
-                    error={Boolean(errors.clientPositionId)}
+                {/* <FormControl error={Boolean(errors.clientPositionId)}>
+                    <FormControlLabel>Position Name</FormControlLabel>
+                    <Select variant="outlined" >
+                        <MenuItem  {...register("clientPositionId")} value={1}>HRD</MenuItem>
+                        <MenuItem  {...register("clientPositionId")} value={2}>Manager</MenuItem>
+                    </Select>
+                </FormControl> */}
+                <TextField
                     sx={{width: 1, display: 'flex', pr: 1}}
-                    inputProps={{
+                    inputprops={{
                         style:{
                             borderRadius:"10px"
                         }
                     }}
-                    disablePortal 
+                    id="clientPositionId"
                     size="small"
-                    id="position-name"
-                    options={clientPositionId} 
-                    fullWidth
-                    renderInput={(params)=><TextField 
-                        {...register('clientPositionId',validation.clientPositionId)}
-                        {...params} placeholder="Position Name" 
-                        fullWidth />}
+                    required
+                    type="text" 
+                    fullwidth 
+                    label="Client Position Id"
+                    autoFocus 
+                    variant="outlined"
+                    {...register("clientPositionId")}
+                    error={Boolean(errors.clientPositionId)}
+                    helperText={errors.clientPositionId?.message}
                 />
             </Grid>
-                <FormHelperText style={{color:'#d32f2f'}}>{errors.clientPositionId?.message}</FormHelperText>
+                {/* <FormHelperText style={{color:'#d32f2f'}}>{errors.clientPositionId?.message}</FormHelperText> */}
             <Grid item mt={1}/>
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                 <TextField
                     sx={{width: 1, display: 'flex', pr: 1}}
-                    inputProps={{
+                    inputprops={{
                         style:{
                             borderRadius:"10px"
                         }
@@ -353,7 +378,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     size="small"
                     required
                     type="agencyName" 
-                    fullWidth 
+                    fullwidth 
                     label="Agency Name"
                     autoFocus 
                     variant="outlined"
@@ -366,7 +391,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                 <TextField
                     sx={{width: 1, display: 'flex', pr: 1}}
-                    inputProps={{
+                    inputprops={{
                         style:{
                             borderRadius:"10px"
                         }
@@ -374,7 +399,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     id="outlined-multiline-static"
                     label="Agency Address"
                     multiline
-                    fullWidth
+                    fullwidth
                     autoFocus
                     rows={4}  
                     variant="outlined"
@@ -389,7 +414,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                 textTransform: 'none'}} variant="contained"  
                 fullWidth   
                 type="submit"
-                inputProps={{
+                inputprops={{
                     style:{
                         borderRadius:"10px"
                     }
@@ -406,7 +431,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
             sx={{ color: 'gray', borderColor: 'grey.500', textTransform: 'none' }} 
             variant="outlined" 
             startIcon={<GoogleIcon/>}
-            inputProps={{
+            inputprops={{
                 style:{
                     borderRadius:"10px"
                 }
