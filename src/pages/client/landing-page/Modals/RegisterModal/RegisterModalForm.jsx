@@ -8,17 +8,18 @@ import { useState,useEffect } from 'react';
 import CloseIcon from "@mui/icons-material/Close";
 import GoogleIcon from '@mui/icons-material/Google';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios'
 
 const RegisterModalForm=({regOpen,regClose})=>{ 
     const validation = Yup.object().shape({
-        userName:Yup.string()
+        username:Yup.string()
         .required('Username is required')
         .min(6,'Username must be at least 6 character')
         .max(20,'Username must not exceed 20 character'),
-        firstName:Yup.string()
+        first_name:Yup.string()
         .required('Firstname is required')
         .matches(/^[a-zA-Z]+$/,'Firstname must contain only alphabetic characters'),
-        lastName:Yup.string()
+        last_name:Yup.string()
         .required('Lastname is required')
         .matches(/^[a-zA-Z]+$/,'Lastname must contain only alphabetic characters'),
         email:Yup.string()
@@ -33,58 +34,43 @@ const RegisterModalForm=({regOpen,regClose})=>{
         .oneOf([Yup.ref('password'),null],'Retype Password does not match'),
         sex:Yup.string()
         .required('Gender is required'),
-        birthdate:Yup.date()
+        birth_date:Yup.date()
         .required('Birthdate is required'),
-        clientPositionId:Yup.string()
-        .required('Position is required'),
-        agencyName:Yup.string()
+        client_position_id:Yup.string()
+        .required('Position name is required'),
+        agency_name:Yup.string()
         .required('Agency Name is required'),
-        agencyAddress:Yup.string()
+        agency_address:Yup.string()
         .required('Agency Address is required')        
     });
     const{register,handleSubmit,formState:{errors},reset}=useForm({
-       resolver:yupResolver(validation)},{defaultValue:{
-        userName:"test1",
-        firstName:"test2",
-        lastName:"test3",
-        email:"test@gmail.com",
-        password:"testing123", 
-        sex:"L",
-        birthdate:"1999-10-10",
-        clientPositionId:"1",
-        agencyName:"PT test",
-        agencyAddress:"Bandoeng",
-    }}); 
-    // const [state,setState] = useState({
-    //     userId:"1",
-    //     id:"1",
-    //     title:"irir",
-    //     body:"irir"
-    // });
-    const url = "http://localhost:8080/api/user-management/users/register";
-    // const url = "https://jsonplaceholder.typicode.com/posts"; 
-    const onSubmit = data =>{  
-        console.log(JSON.stringify(data,null,2));
-        alert('good');
-        fetch(url, {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userName:data.userName,
-                firstName:data.firstName,
-                lastName:data.lastName,
+       resolver:yupResolver(validation)});  
+    
+       const url = "http://localhost:8080/api/user-management/users/register"; 
+    const onSubmit = async (data) =>{  
+        alert('The data have been registered successfully!')
+        const config = {headers:{"Content-Type":"application/json"}};
+        try{
+            const response = await axios.post(url,{
+                username:data.username,
+                first_name:data.first_name,
+                last_name:data.last_name,
                 email:data.email,
                 password:data.password,
                 sex:data.sex,
-                birthdate:data.birthdate.toISOString().split("T")[0],
-                clientPositionId:data.clientPositionId,
-                agencyName:data.agencyName,
-                agencyAddress:data.agencyAddress
-            })
-            }).then(() => {             
-           // reset();
-            alert('data berhasil didaftarkan');
-        })
+                birth_date:data.birth_date.toISOString().split("T")[0],
+                client_position_id:data.client_position_id,
+                agency_name:data.agency_name,
+                agency_address:data.agency_address
+            },config);
+            console.log('Response : ',response.data);
+        } catch(error){
+            console.error('Error : ',error);
+            if(error.response)
+            {
+                console.log('Error response : ',error.response.data);
+            }
+        }
     };
     const [isModOpen,setIsRegMoOpen]=useState(regOpen);
     const [showPassword, setShowPassword] = useState(false);
@@ -109,7 +95,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
         
     return(
         isModOpen &&
-        <Dialog open={isModOpen} onClose={closeRegisterModal} fullwidth maxWidth="sm"  inputprops={{
+        <Dialog name="reg-dialog" open={isModOpen} onClose={closeRegisterModal} fullwidth maxWidth="sm"  inputprops={{
             style: {borderRadius: "10px"}
             }}>
         <DialogTitle>
@@ -134,34 +120,35 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         inputprops={{
                             style:{
                                 borderRadius:"10px"
-                            }
+                            },
+                            "data-testid":"username"
                         }}
-                        id="userName"
-                        size="small"
-                        required
-                        type="userName" 
+                        id="username"
+                        size="small" 
+                        type="text" 
                         fullwidth 
+                        name = "username" 
                         placeholder="Username"
                         autoFocus 
                         variant="outlined"
-                        {...register("userName")}
-                        error={Boolean(errors.userName)}
-                        helperText={errors.userName?.message}
+                        {...register("username")}
+                        error={Boolean(errors.username)}
+                        helperText={errors.username?.message}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                     <TextField 
                         sx={{width: 1, display: 'flex', pr: 1}}
-                        id="firstName"
+                        id="first_name"
                         size="small"
                         required
                         type="text"   
                         placeholder="First Name"
                         autoFocus
                         variant="outlined"
-                        {...register("firstName")}
-                        error={Boolean(errors.firstName)}
-                        helperText={errors.firstName?.message}
+                        {...register("first_name")}
+                        error={Boolean(errors.first_name)}
+                        helperText={errors.first_name?.message}
                         inputprops={{
                             style: {
                                 borderRadius: "10px",
@@ -172,16 +159,16 @@ const RegisterModalForm=({regOpen,regClose})=>{
                 <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                     <TextField
                         sx={{width: 1, display: 'flex', pr: 1}}
-                        id="lastName"
+                        id="last_name"
                         required
                         size="small"
                         type="text"   
                         placeholder="Last Name"
                         autoFocus
                         variant="outlined"
-                        {...register("lastName")}
-                        error={Boolean(errors.lastName)}
-                        helperText={errors.lastName?.message}
+                        {...register("last_name")}
+                        error={Boolean(errors.last_name)}
+                        helperText={errors.last_name?.message}
                         inputprops={{
                             style: {
                                 borderRadius: "10px",
@@ -202,7 +189,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         required
                         type="email" 
                         fullwidth 
-                        placeholder="E-mail"
+                        placeholder="Email"
                         autoFocus
                         variant="outlined"
                         {...register("email",validation.email)}
@@ -241,39 +228,13 @@ const RegisterModalForm=({regOpen,regClose})=>{
                             )
                         }}
                     />
-                </Grid>                                
-            <Grid>                
-                <FormControlLabel
-                    sx={{ml:'0.5rem',
-                    fontFamily: 'Poppins',
-                    fontSize:5                               
-                }}                                 
-                label="Password is at least 8 characters long"
-                control={                                        
-                    <Checkbox checked  
-                    sx={{width:100}} disabled />
-                }
-                />
-                <Grid item mt={0} />
-                <FormControlLabel
-                    sx={{ml:'0.5rem',
-                    fontFamily: 'Poppins',
-                    fontSize:5
-                }}
-                label="Password contains at least one letter and one number"
-                control={
-                    <Checkbox checked 
-                    sx={{width:100}} disabled />
-                }
-                />
-            </Grid>
-            <Grid item mt={1} />
+                </Grid>    
                 <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                     <TextField
                         sx={{width: 1, display: 'flex', pr: 1}}
                         id="confirmPassword" 
                         required
-                        fullwidth 
+                        fullwidth  
                         placeholder="Type your password again"
                         size="small" 
                         autoFocus
@@ -304,11 +265,12 @@ const RegisterModalForm=({regOpen,regClose})=>{
             <Grid item mt={1} />
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                 <FormControl>
-                    <FormLabel id="sex">Gender</FormLabel>
-                    <RadioGroup   
+                    <FormLabel for="sex" id="sex-label">Gender</FormLabel>
+                    <RadioGroup 
+                        data-testid ="gender"
+                        id = "sex"  
                         error={Boolean(errors.sex)}                     
-                        row                        
-                        fullwidth
+                        row    
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="sex-radio-button" >
                         <FormControlLabel value="L" control={<Radio {...register('sex',validation.sex)} />} label="Male"/>                        
@@ -319,31 +281,24 @@ const RegisterModalForm=({regOpen,regClose})=>{
             </Grid>
                 <FormHelperText style={{color:'#d32f2f'}}>{errors.sex?.message}</FormHelperText>
             <Grid item mt={1} />
+            <FormLabel for="birth_date" >Birthdate</FormLabel>
+            <Grid item mt={1} />
             <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>  
-            <FormControl >
-                <FormLabel>Birthdate</FormLabel>
                 <TextField
-                    {...register('birthdate',validation.birthdate)}
+                    {...register('birth_date',validation.birth_date)}
                     sx={{width: 1, display: 'flex', pr: 1}} 
                     type="date"
                     size = "small" 
                     required 
-                    id = "birthdate"
-                    fullWidth                       
-                    error={Boolean(errors.birthdate)}
-                    helperText={errors.birthdate?.message}
-                />
-            </FormControl>
+                    id = "birth_date"
+                    data-testid= "birthdate"                    
+                    fullwidth                       
+                    error={Boolean(errors.birth_date)}
+                    helperText={errors.birth_date?.message}
+                />             
             </Grid>  
             <Grid item mt={1} />
-            <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                {/* <FormControl error={Boolean(errors.clientPositionId)}>
-                    <FormControlLabel>Position Name</FormControlLabel>
-                    <Select variant="outlined" >
-                        <MenuItem  {...register("clientPositionId")} value={1}>HRD</MenuItem>
-                        <MenuItem  {...register("clientPositionId")} value={2}>Manager</MenuItem>
-                    </Select>
-                </FormControl> */}
+            <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}> 
                 <TextField
                     sx={{width: 1, display: 'flex', pr: 1}}
                     inputprops={{
@@ -351,20 +306,19 @@ const RegisterModalForm=({regOpen,regClose})=>{
                             borderRadius:"10px"
                         }
                     }}
-                    id="clientPositionId"
+                    id="client_position_id"
                     size="small"
                     required
                     type="text" 
                     fullwidth 
-                    label="Client Position Id"
+                    placeholder="Client Position Id"
                     autoFocus 
                     variant="outlined"
-                    {...register("clientPositionId")}
-                    error={Boolean(errors.clientPositionId)}
-                    helperText={errors.clientPositionId?.message}
+                    {...register("client_position_id")}
+                    error={Boolean(errors.client_position_id)}
+                    helperText={errors.client_position_id?.message}
                 />
             </Grid>
-                {/* <FormHelperText style={{color:'#d32f2f'}}>{errors.clientPositionId?.message}</FormHelperText> */}
             <Grid item mt={1}/>
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                 <TextField
@@ -374,17 +328,17 @@ const RegisterModalForm=({regOpen,regClose})=>{
                             borderRadius:"10px"
                         }
                     }}
-                    id="agencyName"
+                    id="agency_name"
                     size="small"
                     required
-                    type="agencyName" 
+                    type="agency_name" 
                     fullwidth 
-                    label="Agency Name"
+                    placeholder="Agency Name"
                     autoFocus 
                     variant="outlined"
-                    {...register("agencyName")}
-                    error={Boolean(errors.agencyName)}
-                    helperText={errors.agencyName?.message}
+                    {...register("agency_name")}
+                    error={Boolean(errors.agency_name)}
+                    helperText={errors.agency_name?.message}
                 />
             </Grid>
             <Grid item mt={1}/>
@@ -397,15 +351,15 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         }
                     }}
                     id="outlined-multiline-static"
-                    label="Agency Address"
+                    placeholder="Agency Address"
                     multiline
                     fullwidth
                     autoFocus
                     rows={4}  
                     variant="outlined"
-                    {...register("agencyAddress")}
-                    error={Boolean(errors.agencyAddress)}
-                    helperText={errors.agencyAddress?.message}
+                    {...register("agency_address")}
+                    error={Boolean(errors.agency_address)}
+                    helperText={errors.agency_address?.message}
                     />
             </Grid>
         <Grid item m={3} />
@@ -414,6 +368,8 @@ const RegisterModalForm=({regOpen,regClose})=>{
                 textTransform: 'none'}} variant="contained"  
                 fullWidth   
                 type="submit"
+                name="register"
+                data-testid = "register"
                 inputprops={{
                     style:{
                         borderRadius:"10px"
@@ -441,8 +397,9 @@ const RegisterModalForm=({regOpen,regClose})=>{
             </Button>
         </Grid>                        
         <Grid item mt={5} sx={{alignSelf:'center'}}>
+        <span style={{textAlign:'center', display:'block', width:'100%'}}>
         <Typography display="inline" variant="body1" fontFamily = 'Poppins'>Already have an Account?</Typography>
-        <Link fontFamily = 'Poppins'  display="inline" href="#"> Sign In Here</Link>
+        <Link fontFamily = 'Poppins'  display="inline" href="#"> Sign In Here</Link></span>
         </Grid> 
     </DialogContent> 
     </Box>
