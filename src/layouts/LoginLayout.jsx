@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import { Button, Container, Grid, TextField, Typography } from '@mui/material';
 
 import BoxContainer from '@astarx-studio/mui/components/BoxContainer';
 import { useAuthManager, useIdentity } from '@astarx-studio/react-core/auth';
@@ -56,9 +56,7 @@ const LoginLayout = () => {
           <Grid item xs={6}>
             <Container maxWidth="md">
               <Grid container direction="column" spacing={2}>
-                <Grid item>
-                  <Box sx={{ height: 120, width: 120, bgcolor: '#fff' }} />
-                </Grid>
+                <Grid item>{/* <Box sx={{ height: 120, width: 120, bgcolor: '#fff' }} /> */}</Grid>
                 <Grid item sx={{ color: '#fff' }}>
                   <Typography variant="h6">
                     Lorem Ipsum Dolor Sit Amet Blabla Blabla
