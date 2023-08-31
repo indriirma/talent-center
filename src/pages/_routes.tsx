@@ -4,13 +4,16 @@ import { ThemeProvider } from '@mui/material';
 
 import { SecurableRoute } from '@astarx-studio/react-core/router';
 
-import LoginLayout from 'layouts/LoginLayout';
 import DashboardLayout from 'layouts/DashboardLayout';
+import LoginLayout from 'layouts/LoginLayout';
 
 import Customer from './customer';
 // import Client from './client';
 
 import { LightTheme } from 'resource/themes';
+import DaftarTalent from './admin/DaftarTalent';
+import Dashboard from './admin/Dashboard';
+import TambahTalent from './admin/TambahTalent';
 import LandingPage from './client/landing-page';
 
 const routes: SecurableRoute[] = [
@@ -26,15 +29,15 @@ const routes: SecurableRoute[] = [
     path: 'client',
     element: (
       <ThemeProvider theme={LightTheme}>
-        <Outlet/>
+        <Outlet />
       </ThemeProvider>
     ),
-    children:[
+    children: [
       {
         index: true,
-        element:<LandingPage/>,
-      }, 
-    ]
+        element: <LandingPage />,
+      },
+    ],
   },
 
   {
@@ -59,7 +62,27 @@ const routes: SecurableRoute[] = [
         children: [
           {
             index: true,
-            element: <>This... Is... DASHBOARD!!!</>,
+            element: <Dashboard />,
+          },
+        ],
+      },
+      {
+        path: 'daftar-talent',
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <DaftarTalent />,
+          },
+        ],
+      },
+      {
+        path: 'tambah-talent',
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <TambahTalent />,
           },
         ],
       },
