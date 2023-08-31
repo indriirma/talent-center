@@ -11,7 +11,7 @@ import Customer from './customer';
 // import Client from './client';
 
 import { LightTheme } from 'resource/themes';
-import LandingPage from './client/landing-page/Modals';
+import LandingPage from './client/landing-page';
 
 const routes: SecurableRoute[] = [
   {

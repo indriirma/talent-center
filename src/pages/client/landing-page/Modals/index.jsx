@@ -1,11 +1,13 @@
-import { Box, Button, Container, Typography } from '@mui/material';
+import React from 'react';
+import { Box, Button, Container, Typography,Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
 import RegisterModal from './RegisterModal';
-import SignInModal from './SignInModal'; // Pastikan Anda mengimpor komponen SignInModal yang sesuai
+import SignInModal from './SignInModal'; // Pastikan Anda mengimpor komponen SignInModal yang sesuai 
 
-const Modals = () => {
+const Navbar = () => {
+  const logoP79 = `${process.env.PUBLIC_URL}/resource/image/logotujuhsembilan-without-text.svg`
   const [openRegis, setOpenRegis] = useState(false);
-  const [openSignIn, setOpenSignIn] = useState(false);
+  const [openSignIn, setOpenSignIn] = useState(false); 
 
   const handleOpenRegis = () => setOpenRegis(!openRegis);
   const handleOpenSignIn = () => setOpenSignIn(!openSignIn);
@@ -14,35 +16,56 @@ const Modals = () => {
     setOpenRegis(openRegis);
   }, [openRegis]);
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        component="form"
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Typography component="h1" variant="h3">
-          Landing Page
-        </Typography>
-        <Button onClick={handleOpenRegis} color="primary" variant="contained">
-          Register
-        </Button>
-        <Button
-          onClick={handleOpenSignIn}
-          variant="contained"
-          sx={{ marginTop: 2 }} // Tambahkan margin di sini untuk memberikan jarak
-        >
-          Sign In
-        </Button>
-        {openRegis && <RegisterModal open={openRegis} close={setOpenRegis} />}
-        {openSignIn && <SignInModal open={openSignIn} close={setOpenSignIn} />}
-      </Box>
-    </Container>
+  return(
+    <Box sx={{padding:{xs:'17px 10px', sm:'25px 20px'}, backgroundColor:{xs:'rgba(21,21,21,0.8)',sm:'transparent'}}}>
+      <Container maxWidth="false">
+        <Grid container justifyContent="space-between">
+          <Grid 
+          container
+          direction="row"
+          alignItems="center"
+          sx={{width:'fit-content',gap:'15px'}}>
+            <Grid item sx={{width:{xs:'20%',sm:'auto'}}}>
+              <img src={logoP79} alt='PT Padepokan 79 Logo' width="100%"
+              height="auto" />
+            </Grid>
+            <Grid item>
+              <Typography fontFamily="Poppins">
+                Talent Center 79</Typography>    
+            </Grid>
+          </Grid>
+          <Grid container direction="row" alignItems="center"
+          sx={{width:'fit-content',gap:'10px'}} >
+            <Grid item sx={{display:{xs:'none',sm:'block'}}}>
+              <Button onClick={handleOpenRegis} sx={{color:'white', textTransform:'none', borderRadius:'25px'}}>
+                <Typography fontFamily="Inter">
+                  Register
+                </Typography>
+              </Button>
+              {
+                openRegis &&
+                <RegisterModal open={openRegis} close={setOpenRegis} />
+              }
+            </Grid>
+            <Grid item sx={{display:{xs:'none',sm:'block'}}}>
+              <Button variant="outlined" 
+              onClick={handleOpenSignIn} 
+              sx={{color:'white', textTransform:'none',borderWidth:'2px',borderColor:'white', borderRadius:'25px'}} >
+                <Typography fontFamily="Inter">
+                  Sign In
+                </Typography>
+              </Button>
+              {
+                openSignIn &&
+                <SignInModal open={openSignIn} close={setOpenSignIn} />
+              }
+            </Grid>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
+  
 };
 
-export default Modals;
+export default Navbar;

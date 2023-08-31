@@ -117,8 +117,7 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
               </Grid>
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <TextField
-                  sx={{ width: 1, display: 'flex', pr: 1 }}
-                  inputprops={{ style: { borderRadius: '10px' } }}
+                  sx={{ width: 1, display: 'flex', pr: 1 }} 
                   id="password"
                   size="small"
                   required

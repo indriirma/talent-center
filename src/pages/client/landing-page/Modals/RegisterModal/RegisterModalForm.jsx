@@ -1,6 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import * as Yup from 'yup';
+import CloseIcon from '@mui/icons-material/Close';
+import GoogleIcon from '@mui/icons-material/Google';
+import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, 
+    IconButton, InputAdornment, Link, TextField, Typography, FormControl, 
+    FormLabel, RadioGroup,FormControlLabel,Radio,
+    FormHelperText } from '@mui/material';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 
 const RegisterModalForm=({regOpen,regClose})=>{ 
     const validation = Yup.object().shape({
@@ -16,7 +26,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
         .matches(/^[a-zA-Z]+$/,'Lastname must contain only alphabetic characters'),
         email:Yup.string()
         .required('Email is required')
-        .matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,'Email is invalid'),
+        .matches(/^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,'Email is invalid'),
         password:Yup.string()
         .required('Password is required')
         .min(8,'Password is at least 8 characters long')
@@ -35,7 +45,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
         agency_address:Yup.string()
         .required('Agency Address is required')        
     });
-    const{register,handleSubmit,formState:{errors},reset}=useForm({
+    const{register,handleSubmit,formState:{errors}}=useForm({
        resolver:yupResolver(validation)});  
     
        const url = "http://localhost:8080/api/user-management/users/register"; 
@@ -206,7 +216,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         error={Boolean(errors.password)}
                         helperText={errors.password?.message}
                         type={showPassword ? 'text' : 'password'}
-                        inputprops={{
+                        inputProps={{
                             style:{
                                 borderRadius:"10px"
                             },
@@ -238,7 +248,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                         error={Boolean(errors.confirmPassword)}
                         helperText={errors.confirmPassword?.message}
                         type={showConfirmPassword ? 'text' : 'password'}
-                        inputprops={{
+                        inputProps={{
                             style:{
                                 borderRadius:"10px"
                             },
@@ -260,11 +270,11 @@ const RegisterModalForm=({regOpen,regClose})=>{
             <Grid item mt={1} />
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
                 <FormControl>
-                    <FormLabel for="sex" id="sex-label">Gender</FormLabel>
+                    <FormLabel id="sex-label">Gender</FormLabel>
                     <RadioGroup 
                         data-testid ="gender"
                         id = "sex"  
-                        error={Boolean(errors.sex)}                     
+                        error={Boolean(errors.sex)}
                         row    
                         aria-labelledby="demo-row-radio-buttons-group-label"
                         name="sex-radio-button" >
@@ -276,7 +286,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
             </Grid>
             <FormHelperText style={{ color: '#d32f2f' }}>{errors.sex?.message}</FormHelperText>
             <Grid item mt={1} />
-            <FormLabel for="birth_date" >Birthdate</FormLabel>
+            <FormLabel >Birthdate</FormLabel>
             <Grid item mt={1} />
             <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>  
                 <TextField
@@ -287,7 +297,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     required 
                     id = "birth_date"
                     data-testid= "birthdate"                    
-                    fullwidth                       
+                    fullWidth                       
                     error={Boolean(errors.birth_date)}
                     helperText={errors.birth_date?.message}
                 />             
@@ -305,7 +315,7 @@ const RegisterModalForm=({regOpen,regClose})=>{
                     size="small"
                     required
                     type="text" 
-                    fullwidth 
+                    fullWidth 
                     placeholder="Client Position Id"
                     autoFocus 
                     variant="outlined"

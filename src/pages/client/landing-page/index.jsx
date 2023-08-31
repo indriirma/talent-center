@@ -1,378 +1,145 @@
-import { Container, Typography,Box,Button,Radio,RadioGroup,
-    Dialog, FormControlLabel,Checkbox, DialogTitle,DialogContent, IconButton, 
-    Grid, TextField, InputAdornment,Link,FormControl,FormLabel, Autocomplete} from "@mui/material";  
-import { useState,useCallback } from 'react';
-import CloseIcon from "@mui/icons-material/Close"
-import { useForm } from "react-hook-form"; 
-import GoogleIcon from '@mui/icons-material/Google';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
-import {LocalizationProvider,DatePicker,AdapterDayjs} from '@mui/x-date-pickers'
+import{Box,Container,Grid,IconButton,InputAdornment,TextField,Typography,Autocomplete, Button} from '@mui/material';
+import Navbar from './Modals';
+import {useState,useEffect} from 'react';
+import axios from 'axios'; 
+import { SearchOutlined } from '@mui/icons-material';
+import Footer from './Footer'
 
-const LandingPage=()=>{  
-    const {register,handleSubmit,formState:{errors},reset}=useForm(); 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    //const [successMsg,setSuccessMsg]=useState("");
-    const [statusModal,setOpenModal] = useState(false); 
-    const [formState, setFormState] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      });
+const PopularTags=({tagTitle}) =>{
+    return(
+        <>
+            <Grid item sx={{mx:'0.5rem', my:{xs:'0.5rem',sm:'0'},
+            px:'0.75rem',display:'flex',alignItems:'center',backgroundColor:'white',borderRadius:"3px"}} >
+                <Button sx={{color:'black',padding:'5px 0px'}}>
+                    <Typography fontFamily="Inter" variant='body2'>
+                        {tagTitle}
+                    </Typography>
+                </Button>
+            </Grid>
+        </>
+    )
+}
 
-      let positionName=[{label:'HRD',value:1},
-    {label: 'Manager', value:2}];
-    
-      const handleTextChange = useCallback(
-        (field) => (event) => {
-          setFormState((prev) => ({
-            ...prev,
-            [field]: event.target.value,
-          }));
-        },
-        []
-      );
-    const openRegisterModal=()=>{
-        setOpenModal(true);
-    } 
-    const closeRegisterModal=()=>{
-        setOpenModal(false);
-    } 
-    const onSubmit=(data)=>{
-        console.log(data);
-        //setSuccessMsg("The registration is successfull");
-        reset();
-        alert("The registration is successfull");
-    }; 
-    
-    const handleShowPassword = () => {
-        setShowPassword((hidePassword) => !hidePassword);
-    };
-    const handleShowConfirmPassword = () => {
-        setShowConfirmPassword((hidePassword) => !hidePassword);
-    };
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-    const validation={
-        firstName:{required:"First Name is required!"},
-        lastName:{required:"Last Name is required!"},
-        email:{
-            required:"Email is required!",
-            pattern:{
-                value:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                message:"Email isn't valid!"
+const LandingPage=()=>{
+    const background = `${process.env.PUBLIC_URL}/resource/image/bg-landing-page.svg`
 
-            }
-        },
-        password:{
-            required:"Password is required!", 
-            minLength:{
-                value:8,
-                message:"Password should be at-least 8 character"
-            },           
-            pattern:{
-                value:/^(?=.*\d)(?=.*[0-9])(?=.*[a-zA-Z]).{0,255}$/,
-                message:"Password should contain at least one letter and one number!"
-            }
-        },
-        confirmPassword:{
-            required:"Confirmation Password is required!" 
-        }        
-    }
+    const sentences = [
+        'Welcome to\nTalent Center 79',
+        'Find a Talent\nThat Suits Your Requirements',
+        'Build the Perfect Team\nFor the Brighter Future'
+    ];
+    const [index,setIndex] = useState(0);
+    const [sentence,setSentence] = useState(sentences[index]);
+    const [showTitle,setShowTitle] = useState(true);
+    useEffect(()=>{
+        const interval = setInterval(()=>{
+            if(index===sentences.length-1){
+                setIndex(0);
+            } else{
+                setIndex(index+1)
+            }            
+            setShowTitle(false);
+            setTimeout(()=>{
+                setSentence(sentences[index]);
+                setShowTitle(true);
+            },300)
+        },5000)
+        return ()=>clearInterval(interval);
+    },[index,sentences])
+    const [popularTags, setPopularTags] = useState([{}]);
+    useEffect(()=>{
+        axios.get('localhost:8080//api/tag-management/popular-tags-option-lists')
+        .then(response=>{
+            setPopularTags(response.data);
+        })
+        .catch(error=>{
+            alert('Error in Popular Tags : ',error);
+        })
+    },[]);
+
+    const [tags,setTags] = useState([{}]);
+    useEffect(()=>{
+        axios.get('localhost:8080//api/tag-management/tags-option-lists')
+        .then(response=>{
+            setTags(response.data);
+        })
+        .catch(error=>{
+            alert('Error in Tags : ',error)
+        })
+    },[])
+
 
     return(
-        <Container component="main" maxWidth='xs'>
-            <Box component="form" sx={{
-                marginTop:8,
-                display: 'flex',
-                flexDirection:'column',
-                alignItems:'center',
-            }}>
-                <Typography component="h1" variant="h3">
-                    Landing Page
-                </Typography>
-                <Button onClick={openRegisterModal} color="primary" variant="contained">
-                    Register
-                </Button> 
-                <Dialog open={statusModal} onClose={closeRegisterModal} fullWidth maxWidth="sm"  inputProps={{
-                        style: {borderRadius: "10px"}}}>
-                    <DialogTitle>
-                        <IconButton onClick={closeRegisterModal} style={{float:'right'}} >
-                            <CloseIcon color="primary"></CloseIcon>  
-                        </IconButton>
-                        <Grid item>
-                            <Typography data-testid="reg-head" variant="h4" fontFamily = 'Poppins' align="center">
-                            <b>Register</b>
+        <Box sx={{minHeight:'100vh',maxHeight:'fit-content',maxWidth:'100vw',display:'flex',flexDirection:'column',backgroundImage:`url(${background})`, backgroundColor:'dimgray',backgroundBlendMode:'multiply',backgroundSize:'cover',color:'white',backgroundPosition:'center' }}> 
+            <Navbar/>
+            <Container sx={{minHeight:'85vh',display:'flex',flex:'auto',alignItems:'center',justifyContent:'center'}}>
+                <Grid container sx={{minWidth:'fit-content'}}>
+                    <Grid container direction="column">
+                        <Grid item justifyContent="center">
+                            <Typography variant='h4' whiteSpace='pre-line' textAlign="center"
+                            sx={{transition:'opacity 0.1s ease-in-out, transform 0.1s ease-in-out', opacity:showTitle?1:0}}>
+                                {sentence}
                             </Typography>
                         </Grid>
-                        <Grid item>
-                            <Typography fontFamily = 'Poppins' align="center"> Register so you can choose and request our talent</Typography>
-                        </Grid> 
-                    </DialogTitle>
-                    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{mt:1}}>
-                    <DialogContent>
-                            {/* <FormHelperText style={{color:'#7ca936'}} >{successMsg}</FormHelperText> */}
-                            <Grid container spacing={2/1}>
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        inputProps={{
-                                            style:{
-                                                borderRadius:"10px"
-                                            }
-                                        }}
-                                        id="userName"
-                                        size="small"
-                                        required
-                                        type="userName" 
-                                        fullWidth 
-                                        placeholder="Username"
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("email",validation.email)}
-                                        error={Boolean(errors.email)}
-                                        helperText={errors.email?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField 
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        id="firstName"
-                                        size="small"
-                                        required
-                                        type="text"   
-                                        // onChange={handleTextChange('firstName')}
-                                        // value={formState.firstName}
-                                        placeholder="First Name"
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("firstName",validation.firstName)}
-                                        error={Boolean(errors.firstName)}
-                                        helperText={errors.firstName?.message}
-                                        inputProps={{
-                                            style: {
-                                              borderRadius: "10px",
-                                            }
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        id="lastName"
-                                        required
-                                        size="small"
-                                        type="text"  
-                                        // onChange={handleTextChange('lastName')}
-                                        // value={formState.lastName}
-                                        placeholder="Last Name"
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("lastName",validation.lastName)}
-                                        error={Boolean(errors.lastName)}
-                                        helperText={errors.lastName?.message}
-                                        inputProps={{
-                                            style: {
-                                              borderRadius: "10px",
-                                            }
-                                          }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        inputProps={{
-                                            style:{
-                                                borderRadius:"10px"
-                                            }
-                                        }}
-                                        id="email"
-                                        size="small"
-                                        required
-                                        type="email"
-                                        // onChange={handleTextChange('email')}
-                                        // value={formState.email}
-                                        fullWidth 
-                                        placeholder="E-mail"
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("email",validation.email)}
-                                        error={Boolean(errors.email)}
-                                        helperText={errors.email?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        id="password"
-                                        size="small"
-                                        required 
-                                        fullWidth
-                                        // onChange={handleTextChange('password')}
-                                        // value={formState.password} 
-                                        placeholder="Password"
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("password",validation.password)}
-                                        error={Boolean(errors.password)}
-                                        helperText={errors.password?.message}
-                                        type={showPassword ? 'text' : 'password'}
-                                        inputProps={{
-                                            style:{
-                                                borderRadius:"10px"
-                                            },
-                                            endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                aria-label="visibility-button-pass"
-                                                onClick={handleShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                edge="end">
-                                                    {showPassword ? <VisibilityOff/> : <Visibility/>}
+                        <Grid item justifyContent="center" sx={{display:'flex'}}>
+                            <Autocomplete
+                            multiple id="tags-standard" options={tags.map((option)=>option.tagsName)}
+                            renderInput={(params)=>
+                                <TextField
+                                    {...params.inputProps}
+                                    placeholder="Try &quot;Javascript&quot;"
+                                    inputProps={{
+                                        ...params?.inputProps,
+                                        endAdornment:(
+                                            <InputAdornment position='end'>
+                                                <IconButton edge="end">
+                                                    <SearchOutlined sx={{color:'#C4C4C4'}} />
                                                 </IconButton>
                                             </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </Grid>                                
-                            <Grid>
-                            <FormControlLabel
-                                sx={{ml:'0.5rem',
-                                fontFamily: 'Poppins',
-                                fontSize:5                                
-                            }}                                
-                                label="Password is at least 8 characters long"
-                                control={
-                                    <Checkbox disabled />
-                                }
+                                        ),
+                                        sx:{width:{xs:'90vw',sm:'60vw'},backgroundColor:'white',borderRadius:'25px'}
+                                    }}
+                                    InputProps={{...params.inputProps, fontFamily:"Inter",maxLength:"255",autoFocus:true}}
+                                    sx={{
+                                        input:{width:'90%', color:'black',':focus':{width:'90%'}},
+                                    }}
                                 />
-                                <Grid item mt={0} />
-                            <FormControlLabel
-                                sx={{ml:'0.5rem',
-                                fontFamily: 'Poppins',
-                                fontSize:5
+                            }
+                            ChipProps={{sx:{color:'white',backgroundColor:'#142851',fontFamily:"Inter","& .MuiChip-deleteIcon":{color:'white'}}}}
+                            sx={{
+                                mt:'2rem',
+                                "& .MuiAutocomplete-hasPopupIcon":{
+                                    paddingRight:"1rem!important"
+                                },
+                                "& .MuiAutocomplete-hasClearIcon":{
+                                    paddingRight:"1rem!important"
+                                },
+                                "& .MuiAutocomplete-inputRoot":{
+                                    paddingRight:"1rem!important"
+                                },                            
                             }}
-                                label="Password contains at least one letter and one number"
-                                control={
-                                    <Checkbox disabled />
-                                }
-                                />
-                            </Grid>
-                            <Grid item mt={1} />
-                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                    <TextField
-                                        sx={{width: 1, display: 'flex', pr: 1}}
-                                        id="confirmPassword" 
-                                        required
-                                        fullWidth 
-                                        placeholder="Type your password again"
-                                        size="small"
-                                        // onChange={handleTextChange('confirmPassword')}
-                                        // value={formState.confirmPassword}
-                                        autoFocus
-                                        variant="outlined"
-                                        {...register("confirmPassword",validation.confirmPassword)}
-                                        error={Boolean(errors.confirmPassword)}
-                                        helperText={errors.confirmPassword?.message}
-                                        type={showConfirmPassword ? 'text' : 'password'}
-                                        inputProps={{
-                                            style:{
-                                                borderRadius:"10px"
-                                            },
-                                          endAdornment: (
-                                            <InputAdornment position="end">
-                                              <IconButton
-                                              aria-label="visibility-button"
-                                                onClick={handleShowConfirmPassword}
-                                                onMouseDown={handleShowConfirmPassword}
-                                                edge="end">
-                                                  {showConfirmPassword ? <VisibilityOff /> : <Visibility/>}
-                                                </IconButton>
-                                            </InputAdornment>
-                                          )
-                                        }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid item mt={1} />
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                <FormControl>
-                                    <FormLabel id="gender">Gender</FormLabel>
-                                    <RadioGroup
-                                        row
-                                        aria-labelledby="demo-row-radio-buttons-group-label"
-                                        name="gender-radio-button"
-                                    >
-                                        <FormControlLabel value="L" control={<Radio/>} label="Male"/>
-                                        <FormControlLabel value="M" control={<Radio/>} label="Female"/>                            
-                                    </RadioGroup>
-                                </FormControl>
-                            </Grid>
-                            <Grid item mt={1} />
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={['DatePicker']}>
-                                        <DatePicker label="Birthdate"/>
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </Grid>
-                            <Grid item mt={1} />
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between'}}>
-                                <Autocomplete
-                                    disablePortal
-                                    id="position-name"
-                                    options={positionName}
-                                    sx={{width:300}}
-                                    renderInput={(params)=><TextField {...params} label="Position Name" />}
-                                />
-
-                            </Grid>
-                        <Grid item m={3} />
-                        <Grid item>
-                            <Button sx={{
-                                textTransform: 'none'}} variant="contained"  
-                                fullWidth   
-                                type="submit"
-                                inputProps={{
-                                    style:{
-                                        borderRadius:"10px"
-                                    }
-                                }}
-                                >
-                            Register
-                            </Button>
+                            />
                         </Grid>
-                        <Grid item my={1}>
-                            <hr  sx={{ color: 'gray' }}/>
-                        </Grid>
-                        <Grid item sx={{ color: 'gray' }}>
-                            <Button 
-                            sx={{ color: 'gray', borderColor: 'grey.500', textTransform: 'none' }} 
-                            variant="outlined" 
-                            startIcon={<GoogleIcon/>}
-                            inputProps={{
-                                style:{
-                                    borderRadius:"10px"
+                        <Grid item alignItems='center' justifyContent='center' sx={{
+                            display:'flex', mt:'2rem', flexDirection:{xs:'column',sm:'row'},flexWrap:'wrap'
+                        }} >
+                            <Typography fontFamily="Poppins" variant='body1' sx={{mr:'1rem'}}>Popular</Typography>
+                            <div style={{display:'flex',flexWrap:'wrap',justifyContent:"center"}}>
+                                {
+                                    popularTags.map((tag)=>{
+                                        return(
+                                            <PopularTags tagTitle={tag?.tagsName} key={tag?.tagsKey} />
+                                        )
+                                    })
                                 }
-                            }}
-                            fullWidth>
-                            Continue with Google
-                            </Button>
-                        </Grid>                        
-                        <Grid item mt={5} sx={{alignSelf:'center'}}>
-                        <Typography display="inline" variant="body1" fontFamily = 'Poppins'>Already have an Account?</Typography>
-                        <Link fontFamily = 'Poppins'  display="inline" href="#"> Sign In Here</Link>
-                        </Grid> 
-                    </DialogContent> 
-                    </Box>
-                </Dialog>                
-            </Box>
-        </Container>
+                            </div>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Container>
+            <Footer/>
+        </Box>
     );
-};
 
-export default LandingPage
+}
+export default LandingPage;
