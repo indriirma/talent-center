@@ -15,6 +15,7 @@ import DaftarTalent from './admin/DaftarTalent';
 import Dashboard from './admin/Dashboard';
 import TambahTalent from './admin/TambahTalent';
 import LandingPage from './client/landing-page';
+import Main from './client/Main/Dashboard'
 
 const routes: SecurableRoute[] = [
   {
@@ -37,9 +38,34 @@ const routes: SecurableRoute[] = [
         index: true,
         element: <LandingPage />,
       },
+      {
+        path: 'main',
+        element: (
+          <ThemeProvider theme={LightTheme}>
+            <Outlet />
+          </ThemeProvider>
+        ),
+        children:[
+          {
+            index: true,
+            element: <Main/>,
+          },
+          {
+            path: 'wishlist',
+            element:<Main/>
+          },
+          {
+            path: 'request',
+            element:<Main/>
+          },
+          {
+            path: 'detail/:id',
+            element:<Main/>
+          }
+        ],
+      },
     ],
   },
-
   {
     path: 'admin',
     element: (

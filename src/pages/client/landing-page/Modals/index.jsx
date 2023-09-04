@@ -17,17 +17,27 @@ const Navbar = () => {
   }, [openRegis]);
 
   return(
-    <Box sx={{padding:{xs:'17px 10px', sm:'25px 20px'}, backgroundColor:{xs:'rgba(21,21,21,0.8)',sm:'transparent'}}}>
+    <Box sx={{padding:{xs:'17px 10px', sm:'25px 20px'}, backgroundColor:{xs:'rgba(21,21,21,0.8)',
+    sm:'transparent'}}}>
       <Container maxWidth="false">
-        <Grid container justifyContent="space-between">
+        <Grid container justifyContent="space-between" sx={{
+        '@media (max-width: 400px)': {
+          gap: '5px',
+          }}}>
           <Grid 
           container
           direction="row"
           alignItems="center"
-          sx={{width:'fit-content',gap:'15px'}}>
+          sx={{width:'fit-content',gap:'15px',
+          '@media (max-width: 400px)': {
+            gap: '5px',
+            }}}>
             <Grid item sx={{width:{xs:'20%',sm:'auto'}}}>
               <img src={logoP79} alt='PT Padepokan 79 Logo' width="100%"
-              height="auto" />
+              height="auto" sx={{
+                '@media (max-width: 400px)': {
+                  height: '5px',
+                  }}} />
             </Grid>
             <Grid item>
               <Typography fontFamily="Poppins">
@@ -50,7 +60,8 @@ const Navbar = () => {
             <Grid item sx={{display:{xs:'none',sm:'block'}}}>
               <Button variant="outlined" 
               onClick={handleOpenSignIn} 
-              sx={{color:'white', textTransform:'none',borderWidth:'2px',borderColor:'white', borderRadius:'25px'}} >
+              sx={{color:'white', textTransform:'none',borderWidth:'2px',borderColor:'white',
+               borderRadius:'25px'}} >
                 <Typography fontFamily="Inter">
                   Sign In
                 </Typography>
