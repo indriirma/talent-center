@@ -9,6 +9,7 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Table,
   TableBody,
@@ -87,7 +88,7 @@ function DaftarTalent() {
         </Grid>
       </Grid>
       <Grid item xs={12} sm={12}>
-        {/* <TableContainer component={Paper}>
+        <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -122,8 +123,8 @@ function DaftarTalent() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer> */}
-        <TableContainer>
+        </TableContainer>
+        {/* <TableContainer>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -158,7 +159,7 @@ function DaftarTalent() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
       </Grid>
     </Grid>
   );
