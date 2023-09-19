@@ -5,9 +5,8 @@ import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typograp
 import SortYear from './SortYear';
 import ProfileCard from './ProfileCard';
 import { FilterAltOutlined, ArrowDropDownOutlined, Close } from '@mui/icons-material';
-// import {
-//   fetchTalentsWithPagination, // Import metode baru
-// } from 'apis';
+import { fetchTalentList} from 'apis';
+import Cookies from 'js-cookie';
 
 const EntriesToggleButtonGroup = ({ value, onChange }) => {
   const entries = [10, 20, 50];
@@ -56,21 +55,26 @@ const Main = () => {
     setCurrentPage(newpage);
   };
 
-//   useEffect(() => {
-//     setIsLoading(true);
-//     fetchTalentsWithPagination(currentPage, entriesPerPage)
-//       .then((response) => {
-//         setDisplayedTalents(response.data.content);
-//         setTotalTalents(response.data.totalElements);
-//         setTotalPage(response.data.totalPages);
-//       })
-//       .catch((error) => {
-//         // Handle error
-//       })
-//       .finally(() => {
-//         setIsLoading(false); // Set loading to false when data fetching is done
-//       });
-//   }, [currentPage, entriesPerPage]);
+  const dataArray = Cookies.get('loginRequirement');
+  const cookieData = JSON.parse(dataArray || '[]');
+  const userId = cookieData.userId;
+
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchTalentList(currentPage, entriesPerPage)
+      .then((response) => {
+        setDisplayedTalents(response.data.content);
+        setTotalTalents(response.data.totalElements);
+        setTotalPage(response.data.totalPages);
+      })
+      .catch((error) => {
+        // Handle error
+      })
+      .finally(() => {
+        setIsLoading(false); // Set loading to false when data fetching is done
+      });
+  }, [currentPage, entriesPerPage]);
 
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, totalTalents);

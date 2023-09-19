@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FormGroup, Accordion, AccordionSummary, AccordionDetails, Typography, Divider } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-// import { fetchLevel, fetchPosition, fetchSkillsetTypeOptions } from 'apis';
+import { fetchTalentLevel, fetchTalentPosition, fetchSkillSetType } from 'apis';
 
 const FilterAccordion = ({ title, data, idKey, nameKey, selectedItems, onChange  }) => (
   <Accordion sx={{ backgroundColor: 'transparent', boxShadow: 'none' }} defaultExpanded>
@@ -59,19 +59,19 @@ const Sidebar = (
     { id: 3, name: '1 Year of Experience' },
   ];
 
-//   useEffect(() => {
-//     fetchLevel()
-//       .then((response) => setLevels(response.data))
-//       .catch((error) => console.error('Error fetching data:', error));
+  useEffect(() => {
+    fetchTalentLevel()
+      .then((response) => setLevels(response.data))
+      .catch((error) => console.error('Error fetching data:', error));
 
-//     fetchPosition()
-//       .then((response) => setPositions(response.data))
-//       .catch((error) => console.error('Error fetching data:', error));
+    fetchTalentPosition()
+      .then((response) => setPositions(response.data))
+      .catch((error) => console.error('Error fetching data:', error));
 
-//     fetchSkillsetTypeOptions()
-//       .then((response) => setSkillsetTypeOptions(response.data))
-//       .catch((error) => console.error('Error fetching data:', error));
-//   }, []);
+    fetchSkillSetType()
+      .then((response) => setSkillsetTypeOptions(response.data))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   return (
     <div>

@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import RegisterModalForm from '../RegisterModal/RegisterModalForm';
+import Cookies from 'js-cookie'; 
 
 const SignInModalForm = ({ signInOpen, signInClose }) => {
   // const navigate = useNavigate();
@@ -40,12 +41,14 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
           email: data.email,
           password: data.password,
         },
-        config
+        config                
       );
 
       if (response.status === 200) {
         // Sign in successful, handle the result as needed
         console.log('Sign in successful:', response.data);
+        Cookies.set("loginRequirement",JSON.stringify(response.data),{expires:7}); 
+        
         // navigate('/client');
       } else {
         // Sign in failed, handle the error

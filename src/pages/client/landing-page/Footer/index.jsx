@@ -2,6 +2,7 @@ import { Typography,Grid } from "@mui/material";
 import { Copyright, Facebook, Instagram, YouTube } from '@mui/icons-material';
 
 const Footer=()=>{
+    const footerLogo = `${process.env.PUBLIC_URL}/resource/image/logotujuhsembilan-with-text.svg`;
     return (
         <>
         <footer style={{ background: '#142B51', padding: '80px' }}>
@@ -182,7 +183,7 @@ const Footer=()=>{
                   },
                 }}
               >
-                <img src={`${process.env.PUBLIC_URL}/resource/image/logotujuhsembilan2.svg`} alt="logotujuhsembilan" />
+                <img src={footerLogo} alt="logotujuhsembilan" />
               </Grid>
             </div>
           </Grid>

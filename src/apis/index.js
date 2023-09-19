@@ -29,6 +29,7 @@ export const logout = (payload) =>
     }, 125);
   });
 
+//Get API for Landing Page
 export const fetchPopularTags=()=>{
   const url = `${API_BASE_URL}/tags-management/popular-tags-option-lists`;
   return axios.get(url);
@@ -45,3 +46,64 @@ export const fetchSearchTags = async(value)=>{
     throw error;
   }
 };
+
+//API for Main Page
+export const fetchTalentList= async(currentPage, entries, sortBy)=>
+{
+  const url = `${API_BASE_URL}/talent-management/talents`;
+  return await axios.get(url,{
+    params:{
+      sortBy:sortBy,
+      size:entries,
+      page:currentPage-1
+    }
+  });
+}
+
+//API for sidebar Mainpage
+export const fetchTalentLevel=()=>{
+  return axios.get(`${API_BASE_URL}/master-management/talent-level-option-lists`);
+}
+
+export const fetchTalentPosition=()=>{
+  return axios.get(`${API_BASE_URL}/master-management/talent-position-option-lists`);
+}
+
+export const fetchSkillSetType=()=>{
+  return axios.get(`${API_BASE_URL}/master-management/skill-set-type-option-lists`);
+}
+
+export const downloadCV = async(talentId)=>
+{
+  const url = `${API_BASE_URL}/talent-management/talents/download-cv?talentId=${talentId}`;
+  return await axios.post(url,{responseType: 'arraybuffer' });
+}
+
+export const fetchDataTalent=async(talentId)=>{
+  try{
+    const response = await axios.get(`${API_BASE_URL}/talent-management/talents/${talentId}`);
+    return await response.data;
+  }
+  catch(error)
+  {
+    throw error;
+  }
+}
+
+export const addToWishlist = async(talentId,userId)=>{
+  try{
+    const dataToSend = {
+      talentId:talentId,
+      userId:userId
+    };
+    const response = await axios.post(`${API_BASE_URL}/talent-management/talents/add-to-list`,dataToSend);
+  }
+  catch(error)
+  {
+    console.error(error);
+  }
+}
+
+export const fetchWishlist=async(userId)=>{
+  return await axios.get(`${API_BASE_URL}/talent-management/wishlists?userId=${userId}`) ;
+}

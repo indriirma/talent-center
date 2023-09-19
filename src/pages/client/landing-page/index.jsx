@@ -1,7 +1,7 @@
 import{Box,Container,Grid,IconButton,InputAdornment,TextField,Typography,Autocomplete, Button, styled,Stack} from '@mui/material';
 import Navbar from './Modals';
 import {useState,useEffect} from 'react';  
-import Footer from './Footer';
+import Footer from './Footer/Footerx';
 import { fetchPopularTags } from 'apis';
 import SearchBox from './SearchBox';
 
@@ -79,7 +79,8 @@ const LandingPage=()=>{
             height:'800px'
         } }}> 
             <Navbar/>
-            <Container sx={{Height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+            <Container sx={{Height:'100%',display:'flex',flexDirection:'column',
+            alignItems:'center',justifyContent:'center'}}>
                 <Typography                             
                 variant="h2"
                 color="white"

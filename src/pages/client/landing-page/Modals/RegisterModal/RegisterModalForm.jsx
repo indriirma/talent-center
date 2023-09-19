@@ -50,21 +50,21 @@ const RegisterModalForm=({regOpen,regClose})=>{
     
        const url = "http://localhost:8080/api/user-management/users/register"; 
     const onSubmit = async (data) =>{  
-        alert('The data have been registered successfully!')
         const config = {headers:{"Content-Type":"application/json"}};
         try{
             const response = await axios.post(url,{
                 username:data.username,
-                first_name:data.first_name,
-                last_name:data.last_name,
+                firstName:data.first_name,
+                lastName:data.last_name,
                 email:data.email,
                 password:data.password,
                 sex:data.sex,
-                birth_date:data.birth_date.toISOString().split("T")[0],
-                client_position_id:data.client_position_id,
-                agency_name:data.agency_name,
-                agency_address:data.agency_address
+                birthDate:data.birth_date.toISOString().split("T")[0],
+                clientPositionId:data.client_position_id,
+                agencyName:data.agency_name,
+                agencyAddress:data.agency_address
             },config);
+            alert('The data have been registered successfully!')
             console.log('Response : ',response.data);
         } catch(error){
             console.error('Error : ',error);

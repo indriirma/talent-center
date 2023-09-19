@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Box, Divider, Grid, Avatar, Typography, Button, Container, Stack } from '@mui/material';
 import { AddOutlined, KeyboardArrowRight, SimCardDownloadOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-// import MainPageAlert from 'components/GlobalAlert';
-// import { downloadCV, addToWishlist, fetchWishlist } from 'apis';
+// import MainPageAlert from 'components/GlobalAlert'; 
+import Cookies from 'js-cookie';
+import { downloadCV, addToWishlist, fetchWishlist } from 'apis';
 
 const TalentTag = ({ tagTitle }) => {
   return (
@@ -27,79 +28,79 @@ const TalentCard = ({ talentDetail }) => {
 
   const navigate = useNavigate();
 
-  const userId = localStorage.getItem('userId');
+  const dataArray = Cookies.get('loginRequirement');
+  const cookieData = JSON.parse(dataArray || '[]');
+  const userId = cookieData.userId;
 
   const navigateToDetail = (talentId) => {
-    navigate('/detail/' + talentId);
+    navigate('/client/main/detail/' + talentId);
   };
 
   const handleDownloadCV = (talentId, talentName) => {
-    // downloadCV(talentId, talentName)
-    //   .then((response) => {
-    //     // The response data from the server is transformed into a Blob object
-    //     // with the type 'application/pdf'. Blob is a binary data representation,
-    //     // and in this context, it is used to create a PDF file.
-    //     const blob = new Blob([response.data], { type: 'application/pdf' });
+    downloadCV(talentId)
+      .then((response) => {
+        // The response data from the server is transformed into a Blob object
+        // with the type 'application/pdf'. Blob is a binary data representation,
+        // and in this context, it is used to create a PDF file.
+        const blob = new Blob([response.data], { type: 'application/pdf' });
 
-    //     // Determine the filename for the downloaded file
-    //     let filename = 'CV ' + talentName + '.pdf';
-    //     const contentDispositionHeader = response.headers['content-disposition'];
-    //     if (contentDispositionHeader && typeof contentDispositionHeader === 'string') {
-    //       const filenameMatch = contentDispositionHeader.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-    //       if (filenameMatch && filenameMatch[1]) {
-    //         filename = filenameMatch[1].replace(/['"]/g, '');
-    //       }
-    //     }
+        // Determine the filename for the downloaded file
+        let filename = 'CV ' + talentName + '.pdf';
+        const contentDispositionHeader = response.headers['content-disposition'];
+        if (contentDispositionHeader && typeof contentDispositionHeader === 'string') {
+          const filenameMatch = contentDispositionHeader.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, '');
+          }
+        }
 
-    //     // Create a URL object from the blob data
-    //     const blobUrl = window.URL.createObjectURL(blob);
+        // Create a URL object from the blob data
+        const blobUrl = window.URL.createObjectURL(blob);
 
-    //     // Create a temporary <a> element to trigger the download
-    //     const link = document.createElement('a');
-    //     link.href = blobUrl;
-    //     link.download = filename;
-    //     link.click();
+        // Create a temporary <a> element to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        link.click();
 
-    //     // Clean up the temporary URL object
-    //     window.URL.revokeObjectURL(blobUrl);
+        // Clean up the temporary URL object
+        window.URL.revokeObjectURL(blobUrl);
 
-    //     console.log('CV berhasil di download');
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error downloading CV:', error);
-    //   });
+        console.log('CV berhasil di download');
+      })
+      .catch((error) => {
+        console.error('Error downloading CV:', error);
+      });
   };
 
   const handleAddToList = async (talentId) => {
-    // try {
-    //   const userId = localStorage.getItem('userId');
-    //   const success = await addToWishlist(talentId, userId);
+    try { 
+      const success = await addToWishlist(talentId, userId);
 
-    //   if (success) {
-    //     setAlertOpen(true);
-    //     setAlertMessage('Added to wishlist successfully!!');
-    //     setAlertSeverity('success');
+      if (success) {
+        setAlertOpen(true);
+        setAlertMessage('Added to wishlist successfully!!');
+        setAlertSeverity('success');
 
-    //     updateTalentInWishlist(talentDetail.talentId);
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   setAlertOpen(true);
-    //   setAlertMessage('An error occurred during add to wishlist operation.');
-    //   setAlertSeverity('error');
-    // }
+        updateTalentInWishlist(talentDetail.talentId);
+      }
+    } catch (error) {
+      console.error(error);
+      // setAlertOpen(true);
+      // setAlertMessage('An error occurred during add to wishlist operation.');
+      // setAlertSeverity('error');
+    }
   };
 
   const updateTalentInWishlist = async (userId) => {
-    // fetchWishlist(userId)
-    //   .then((response) => {
-    //     const talentIds = response.data.map((item) => item.talentId);
-    //     console.log(talentIds);
-    //     setInWishlist(talentIds.includes(talentDetail.talentId));
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error fetching data:', error);
-    //   });
+    fetchWishlist(userId)
+      .then((response) => {
+        const talentIds = response.data.map((item) => item.talentId); 
+        setInWishlist(talentIds.includes(talentDetail.talentId));
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   };
 
   useEffect(() => {

@@ -29,7 +29,7 @@ const Footerx=()=>{
 
     return(
         <>
-        <Container maxWidth="false" sx={{py:{xs:'2rem', sm:'5rem'},backgroundColor:'#142B51'}} >
+        <Container maxWidth="false" sx={{py:{xs:'2rem', sm:'5rem'},backgroundColor:'#142B51', color:'white'}} >
             <Grid container sx={{display: 'flex', justifyContent:'center', textAlign:{ xs: 'center', sm: 'left'},  width:'100%', flexDirection : {xs: 'column', sm: 'row'}, gap: {xs: '3rem', sm:'20rem'}}}>
                 <Grid item>
                     <Typography fontFamily="Poppins" sx={{fontWeight:'bold'}}>
@@ -42,7 +42,7 @@ const Footerx=()=>{
                             usefulLinks.map((link)=>{
                                 return(
                                     <>
-                                        <Link href={link.linkUrl} sx={{my:'0.25rem', textDecoration:'none',
+                                        <Link href={link.linkUrl} style={{my:'2.5rem', textDecoration:'none',
                                         fontFamily:'Inter',color:'white'}}>
                                             {link.linkTitle}
                                         </Link>
@@ -73,20 +73,16 @@ const Footerx=()=>{
                             </Typography>
                             <Grid container sx={{ display: 'flex', justifyContent:{xs: 'center', sm:'flex-start'}, gap: '20px' }}>
                                 <Grid item>
-                                    <Link sx={{ color:'white' }}>
-                                        <Facebook/>
+                                    <Link>
+                                        <Facebook style={{ marginRight: '15px', color: 'white' }} />
                                     </Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link sx={{ color:'white' }}>
-                                        <Instagram/>
+                                    <Link>
+                                        <Instagram style={{ marginRight: '15px', color: 'white' }} />
                                     </Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link sx={{ color:'white' }}>
-                                        <YouTube/>
+                                    <Link>
+                                        <YouTube style={{ marginRight: '15px', color: 'white' }} />  
                                     </Link>
-                                </Grid>
+                                </Grid> 
                             </Grid>
                         <Grid container sx={{display:'flex',justifyContent:{xs:'center',sm:"flex-start"}}}>
                             <img src={footerLogo} alt="Logo Footer" style={{marginTop:'1rem'}} />
@@ -95,7 +91,7 @@ const Footerx=()=>{
                 </Grid>
             </Grid>
         </Container>
-        <Container maxWidth="false" sx={{py:'1rem',backgroundColor:'#081E43'}}>
+        <Container maxWidth="false" sx={{py:'1rem',backgroundColor:'#081E43', color:'white'}}>
             <Grid container sx={{ display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center' }}>
                     <Grid item sx={{ display: 'flex', flexDirection:'row'}}>
                         <Copyright />
