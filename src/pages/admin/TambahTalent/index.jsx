@@ -1,5 +1,6 @@
 import { ArrowBack } from '@mui/icons-material';
 import AddPhotoIcon from '@mui/icons-material/AddPhotoAlternate';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import {
   Box,
   Button,
@@ -19,8 +20,11 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function TambahTalent() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState('');
   const [talentName, setTalentName] = useState('');
   const [nip, setNip] = useState('');
@@ -38,47 +42,30 @@ function TambahTalent() {
   const [employeeStatuses, setEmployeeStatuses] = useState([]);
   const [selectedEmpStatus, setSelectedEmpStatus] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-  // console.log(selectedCv);
-  
 
   useEffect(() => {
+    // Fetch talent levels, employee statuses, and skill set options
     const apiUrlLevel = 'http://localhost:8080/api/master-management/talent-level-option-lists';
-
-    axios
-      .get(apiUrlLevel)
-      .then((response) => {
-        setTalentLevels(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching talent levels:', error);
-      });
-
     const apiUrlStatus = 'http://localhost:8080/api/master-management/employee-status-option-lists';
-
-    axios
-      .get(apiUrlStatus)
-      .then((response) => {
-        setEmployeeStatuses(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching employee statuses:', error);
-      });
-
     const apiUrlSkill = 'http://localhost:8080/api/master-management/skill-set-option-lists';
 
     axios
-      .get(apiUrlSkill)
-      .then((response) => {
-        setSkillSetOptions(response.data);
-      })
+      .all([axios.get(apiUrlLevel), axios.get(apiUrlStatus), axios.get(apiUrlSkill)])
+      .then(
+        axios.spread((levelResponse, statusResponse, skillResponse) => {
+          setTalentLevels(levelResponse.data);
+          setEmployeeStatuses(statusResponse.data);
+          setSkillSetOptions(skillResponse.data);
+        })
+      )
       .catch((error) => {
-        console.error('Error fetching skill set options:', error);
+        console.error('Error fetching data:', error);
       });
   }, []);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-     console.log('Selected file:', event.target.files[0]);
+    console.log('Selected file:', event.target.files[0]);
   };
 
   const handleCVFileChange = async (event) => {
@@ -129,20 +116,20 @@ function TambahTalent() {
   return (
     <Grid container alignItems="center" spacing={1}>
       <Grid item>
-        <ArrowBack />
-      </Grid>
-      <Grid item>
-        <Typography
+        <Button
           sx={{
             fontFamily: 'Poppins',
             fontWeight: '100',
-            fontSize: '20px',
+            fontSize: '17px',
             marginLeft: '10px',
             verticalAlign: 'middle',
+            color: 'black',
           }}
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/admin/daftar-talent')}
         >
           Kembali
-        </Typography>
+        </Button>
       </Grid>
       <Grid item xs={12} sm={12} sx={{ marginTop: '20px' }}>
         <Card sx={{ backgroundColor: '#fff', padding: '20px', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
@@ -182,6 +169,8 @@ function TambahTalent() {
                   alignItems: 'center',
                   background: 'lightgrey',
                   borderRadius: '5px',
+                  maxWidth: '100px',
+                  width: '100%',
                 }}
               >
                 <label htmlFor="photo-input">
@@ -329,16 +318,20 @@ function TambahTalent() {
                       alignItems: 'center',
                       background: 'lightgrey',
                       borderRadius: '5px',
+                      maxWidth: '100px',
+                      width: '100%',
+                      margin: 'left',
                     }}
                   >
                     <label htmlFor="cv">
                       <IconButton color="primary" aria-label="upload CV" component="span">
-                        {/* <AddPhotoIcon sx={{ fontSize: 48 }} /> */}
+                        <PictureAsPdfIcon sx={{ fontSize: 48 }} />
                       </IconButton>
                     </label>
                     <Input type="file" id="cv" name="cv" onChange={handleCVFileChange} inputProps={{ accept: '.pdf', style: { display: 'none' } }} />
                   </Box>
                 </Grid>
+
                 <Grid item xs={6} sm={6}>
                   {/* Total Pengalaman */}
                   <Typography
@@ -529,7 +522,14 @@ function TambahTalent() {
               </Grid>
             </Grid>
           </Card>
-          <Button onClick={handleSubmit} >Simpan</Button>
+          <Grid style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="contained" style={{ backgroundColor: '#C4C4C4', color: 'white' }} sx={{ marginTop: '15px' }}>
+              Batal
+            </Button>
+            <Button variant="contained" color="primary" sx={{ marginTop: '15px', marginLeft: '10px' }} onClick={handleSubmit}>
+              Simpan
+            </Button>
+          </Grid>
         </form>
       </Grid>
     </Grid>

@@ -16,6 +16,10 @@ import Dashboard from './admin/Dashboard';
 import TambahTalent from './admin/TambahTalent';
 import LandingPage from './client/landing-page';
 import Main from './client/Main/Dashboard'
+import DetailTalent from './admin/DetailTalent';
+import TalentApproval from './admin/TalentApproval.jsx';
+import Talent from './admin';
+import EditTalent from './admin/EditTalent';
 
 const routes: SecurableRoute[] = [
   {
@@ -45,23 +49,23 @@ const routes: SecurableRoute[] = [
             <Outlet />
           </ThemeProvider>
         ),
-        children:[
+        children: [
           {
             index: true,
-            element: <Main/>,
+            element: <Main />,
           },
           {
             path: 'wishlist',
-            element:<Main/>
+            element: <Main />,
           },
           {
             path: 'request',
-            element:<Main/>
+            element: <Main />,
           },
           {
             path: 'detail/:id',
-            element:<Main/>
-          }
+            element: <Main />,
+          },
         ],
       },
     ],
@@ -109,6 +113,46 @@ const routes: SecurableRoute[] = [
           {
             index: true,
             element: <TambahTalent />,
+          },
+        ],
+      },
+      {
+        path: 'detail-talent/:talentId',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <DetailTalent />,
+          },
+        ],
+      },
+      {
+        path: 'edit-talent/:talentId',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <EditTalent />,
+          },
+        ],
+      },
+      {
+        path: 'talent-approval',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <TalentApproval />,
+          },
+        ],
+      },
+      {
+        path: 'talent',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <Talent />,
           },
         ],
       },
