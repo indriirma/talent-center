@@ -90,6 +90,7 @@ export const fetchDataTalent=async(talentId)=>{
   }
 }
 
+//API for my wishlist page
 export const addToWishlist = async(talentId,userId)=>{
   try{
     const dataToSend = {
@@ -106,4 +107,29 @@ export const addToWishlist = async(talentId,userId)=>{
 
 export const fetchWishlist=async(userId)=>{
   return await axios.get(`${API_BASE_URL}/talent-management/wishlists?userId=${userId}`) ;
+}
+
+export const removeWishlist=async(userId,wishlistId)=>{
+  try{
+    const url = `${API_BASE_URL}/talent-management/wishlists/remove`;
+    const reqBody = {
+      userId:userId,
+      wishlistId:wishlistId
+    };
+    return await axios.put(url,reqBody);
+  }
+  catch(error)
+  {
+    console.error(error);
+  }
+}
+
+export const removeAllWishlist=async(userId)=>{
+  try{
+    return await axios.put(`${API_BASE_URL}/talent-management/wishlists/remove-all?userId=${userId}`);
+  }
+  catch(error)
+  {
+    console.error(error);
+  }
 }
