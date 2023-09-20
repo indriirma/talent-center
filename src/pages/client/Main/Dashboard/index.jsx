@@ -5,8 +5,10 @@ import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typograp
 import SortYear from './SortYear';
 import ProfileCard from './ProfileCard';
 import { FilterAltOutlined, ArrowDropDownOutlined, Close } from '@mui/icons-material';
-import { fetchTalentList} from 'apis';
+import { fetchTalentList } from 'apis';
 import Cookies from 'js-cookie';
+import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
+import { useNavigate } from 'react-router-dom';
 
 const EntriesToggleButtonGroup = ({ value, onChange }) => {
   const entries = [10, 20, 50];
@@ -43,8 +45,36 @@ const Main = () => {
   const [totalTalents, setTotalTalents] = useState(0);
   const [displayedTalents, setDisplayedTalents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWarning, setIsWarning] = useState(false);
+  const warnTitle = 'Access Forbidden!';
+  const warnDescription = 'You should login first!';
+  const successTitle = 'Talent added to wishlist!';
+  const successDescription = 'You can check your talent wishlist at "My Wishlist" menu';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const navigateToSignIn = () => {
+    navigate('/client');
+  };
+
+  const handleCloseWarn = () => {
+    setIsWarning(false);
+  };
+
+  const handleOpenWarn = () => {
+    setIsWarning(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpenPopup = () => {
+    setIsModalOpen(true);
+  };
 
   const handleEntriesPerPageChange = (event) => {
     setEntriesPerPage(event.target.value);
@@ -58,7 +88,6 @@ const Main = () => {
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
   const userId = cookieData.userId;
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -88,96 +117,99 @@ const Main = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
-      <Stack direction="row" sx={{ backgroundColor: 'white' }}>
-        <Box sx={{ display: { xs: 'none', sm: 'block' }, py: 6, px: 4, boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.10)' }}>
-          <SideBar></SideBar>
-        </Box>
+    <>
+      <WarningAlert title={warnTitle} description={warnDescription} open={isWarning} close={handleCloseWarn} handleClick={navigateToSignIn} />
+      <SuccessAlert title={successTitle} description={successDescription} open={isModalOpen} close={handleClosePopup} />
+      <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
+        <Navbar />
+        <Stack direction="row" sx={{ backgroundColor: 'white' }}>
+          <Box sx={{ display: { xs: 'none', sm: 'block' }, py: 6, px: 4, boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.10)' }}>
+            <SideBar></SideBar>
+          </Box>
 
-        <Box flex={0} sx={{ flexGrow: 1, my: 4, mx: 3 }}>
-          {/* filter Mobile */}
-          <Stack direction="row" sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'space-between' }}>
-            <Button
-              variant="outlined"
-              startIcon={<FilterAltOutlined size={20} />}
-              endIcon={<ArrowDropDownOutlined />}
-              onClick={handleDrawerOpen}
-              sx={{
-                display: 'flex',
-                borderRadius: '8px',
-                border: '1px solid var(--grey, #848484)',
-                width: '170px',
-                textTransform: 'none',
-                color: 'black',
-              }}
-            >
-              <Typography variant="body2" fontFamily="Inter" style={{ flexGrow: 1, textAlign: 'start' }}>
-                Filter
-              </Typography>
-            </Button>
-            <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
-          </Stack>
-          <Drawer anchor="right" open={isDrawerOpen} onClose={handleDrawerClose}>
-            <Button onClick={handleDrawerClose} sx={{ color: 'black', justifyContent: 'end', mt: 1, mx: 1 }}>
-              <Close />
-            </Button>
-            <Box sx={{ my: 2, mx: 2 }}>
-              <SideBar></SideBar>
-            </Box>
-          </Drawer>
+          <Box flex={0} sx={{ flexGrow: 1, my: 4, mx: 3 }}>
+            {/* filter Mobile */}
+            <Stack direction="row" sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'space-between' }}>
+              <Button
+                variant="outlined"
+                startIcon={<FilterAltOutlined size={20} />}
+                endIcon={<ArrowDropDownOutlined />}
+                onClick={handleDrawerOpen}
+                sx={{
+                  display: 'flex',
+                  borderRadius: '8px',
+                  border: '1px solid var(--grey, #848484)',
+                  width: '170px',
+                  textTransform: 'none',
+                  color: 'black',
+                }}
+              >
+                <Typography variant="body2" fontFamily="Inter" style={{ flexGrow: 1, textAlign: 'start' }}>
+                  Filter
+                </Typography>
+              </Button>
+              <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
+            </Stack>
+            <Drawer anchor="right" open={isDrawerOpen} onClose={handleDrawerClose}>
+              <Button onClick={handleDrawerClose} sx={{ color: 'black', justifyContent: 'end', mt: 1, mx: 1 }}>
+                <Close />
+              </Button>
+              <Box sx={{ my: 2, mx: 2 }}>
+                <SideBar></SideBar>
+              </Box>
+            </Drawer>
 
-          {isLoading ? ( // Render loading indicator while data is being fetched
-            <div>Loading...</div>
-          ) : totalTalents !== 0 ? (
-            <React.Fragment>
-              {/* <Box sx={{ display: { xs: 'flex', sm: 'none' }, mt: '2.5rem' }}>
+            {isLoading ? ( // Render loading indicator while data is being fetched
+              <div>Loading...</div>
+            ) : totalTalents !== 0 ? (
+              <React.Fragment>
+                {/* <Box sx={{ display: { xs: 'flex', sm: 'none' }, mt: '2.5rem' }}>
                 <Typography sx={{ color: '#212121', fontFamily: 'Inter', lineHeight: 'normal' }} variant="body1">
                   Showing you {(currentPage - 1) * entriesPerPage + 1} - {endIndex} talents out of {totalTalents} total for <b>“JavaScript”</b>
                 </Typography>
               </Box> */}
 
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
-              </Box>
+                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                  <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
+                </Box>
 
-              <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
-                {displayedTalents.map((talent) => (
-                  <Grid item xs={12} md={6} key={talent.talentId}>
-                    <ProfileCard talentDetail={talent} />
-                  </Grid>
-                ))}
-              </Grid>
+                <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
+                  {displayedTalents.map((talent) => (
+                    <Grid item xs={12} md={6} key={talent.talentId}>
+                      <ProfileCard talentDetail={talent} open={handleOpenPopup} warn={handleOpenWarn} />
+                    </Grid>
+                  ))}
+                </Grid>
 
-              <Grid
-                container
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  alignItems: { xs: 'flex-end', sm: 'flex-start' },
-                  gap: '1.5rem',
-                  mt: 3,
-                }}
-              >
-                <Stack spacing={4} direction="row" alignItems="center" flexGrow={1} sx={{ background: 'none', padding: 0 }}>
-                  <Typography variant="body2" fontFamily="Inter">
-                    Entries
-                  </Typography>
-                  <EntriesToggleButtonGroup value={entriesPerPage} onChange={handleEntriesPerPageChange} />
-                </Stack>
-
-                <Pagination
-                  shape="rounded"
-                  count={totalPage}
-                  // count={Math.ceil(displayedTalents.length / entriesPerPage)}
-                  page={currentPage}
-                  onChange={(event, newPage) => {
-                    handlePageChange(newPage); // Panggil fungsi handlePageChange dengan halaman baru
+                <Grid
+                  container
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-end', sm: 'flex-start' },
+                    gap: '1.5rem',
+                    mt: 3,
                   }}
-                />
-              </Grid>
-            </React.Fragment>
-          ) : (
+                >
+                  <Stack spacing={4} direction="row" alignItems="center" flexGrow={1} sx={{ background: 'none', padding: 0 }}>
+                    <Typography variant="body2" fontFamily="Inter">
+                      Entries
+                    </Typography>
+                    <EntriesToggleButtonGroup value={entriesPerPage} onChange={handleEntriesPerPageChange} />
+                  </Stack>
+
+                  <Pagination
+                    shape="rounded"
+                    count={totalPage}
+                    // count={Math.ceil(displayedTalents.length / entriesPerPage)}
+                    page={currentPage}
+                    onChange={(event, newPage) => {
+                      handlePageChange(newPage); // Panggil fungsi handlePageChange dengan halaman baru
+                    }}
+                  />
+                </Grid>
+              </React.Fragment>
+            ) : (
               <Box display="flex" flexDirection="column" alignItems="center" gap="20px" justifyContent="center" width="100%">
                 <Box sx={{ width: { xs: '150px', md: '310px' }, md: { xs: '150px', md: '310px' } }}>
                   <img src={bg_not_find_data} alt="no find data" style={{ width: '100%', height: 'auto' }} />
@@ -186,10 +218,11 @@ const Main = () => {
                   Sorry, we couldn't find a suitable talent
                 </Typography>
               </Box>
-          )}
-        </Box>
-      </Stack>
-    </Box>
+            )}
+          </Box>
+        </Stack>
+      </Box>
+    </>
   );
 };
 

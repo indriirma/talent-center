@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Box, Divider, Grid, Avatar, Typography, Button, Container, Stack } from '@mui/material';
 import { AddOutlined, KeyboardArrowRight, SimCardDownloadOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-// import MainPageAlert from 'components/GlobalAlert'; 
+// import MainPageAlert from 'components/GlobalAlert';
 import Cookies from 'js-cookie';
-import { downloadCV, addToWishlist, fetchWishlist } from 'apis';
+import { addToWishlist, fetchWishlist } from 'apis';
+import { handleDownloadCVUrl } from 'pages/component/eventHandler';
 
 const TalentTag = ({ tagTitle }) => {
   return (
@@ -16,7 +17,7 @@ const TalentTag = ({ tagTitle }) => {
   );
 };
 
-const TalentCard = ({ talentDetail }) => {
+const TalentCard = ({ talentDetail, open, warn }) => {
   const totalPositions = talentDetail?.position?.length || 0;
   const totalSkills = talentDetail?.skillSet?.length || 0;
   const maxDisplayedItems = 2; // Ganti dengan jumlah item yang ingin ditampilkan
@@ -36,54 +37,16 @@ const TalentCard = ({ talentDetail }) => {
     navigate('/client/main/detail/' + talentId);
   };
 
-  const handleDownloadCV = (talentId, talentName) => {
-    downloadCV(talentId)
-      .then((response) => {
-        // The response data from the server is transformed into a Blob object
-        // with the type 'application/pdf'. Blob is a binary data representation,
-        // and in this context, it is used to create a PDF file.
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-
-        // Determine the filename for the downloaded file
-        let filename = 'CV ' + talentName + '.pdf';
-        const contentDispositionHeader = response.headers['content-disposition'];
-        if (contentDispositionHeader && typeof contentDispositionHeader === 'string') {
-          const filenameMatch = contentDispositionHeader.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-          if (filenameMatch && filenameMatch[1]) {
-            filename = filenameMatch[1].replace(/['"]/g, '');
-          }
-        }
-
-        // Create a URL object from the blob data
-        const blobUrl = window.URL.createObjectURL(blob);
-
-        // Create a temporary <a> element to trigger the download
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename;
-        link.click();
-
-        // Clean up the temporary URL object
-        window.URL.revokeObjectURL(blobUrl);
-
-        console.log('CV berhasil di download');
-      })
-      .catch((error) => {
-        console.error('Error downloading CV:', error);
-      });
-  };
-
   const handleAddToList = async (talentId) => {
-    try { 
-      const success = await addToWishlist(talentId, userId);
-
-      if (success) {
-        setAlertOpen(true);
-        setAlertMessage('Added to wishlist successfully!!');
-        setAlertSeverity('success');
-
-        updateTalentInWishlist(talentDetail.talentId);
+    try {
+      if (userId === undefined) {
+        warn();
+        return;
       }
+      const success = await addToWishlist(talentId, userId);
+      updateTalentInWishlist(userId);
+      open();
+      console.log(success);
     } catch (error) {
       console.error(error);
       // setAlertOpen(true);
@@ -95,8 +58,8 @@ const TalentCard = ({ talentDetail }) => {
   const updateTalentInWishlist = async (userId) => {
     fetchWishlist(userId)
       .then((response) => {
-        const talentIds = response.data.map((item) => item.talentId); 
-        setInWishlist(talentIds.includes(talentDetail.talentId));
+        const talentIds = response.data.map((item) => item.talentId);
+        setInWishlist(talentIds.includes(talentDetail?.talentId));
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -128,7 +91,7 @@ const TalentCard = ({ talentDetail }) => {
         <Grid item>
           <Avatar
             alt="Talent Picture"
-            src={talentDetail?.profilePicture}
+            src={talentDetail?.talentPhotoUrl}
             sx={{
               width: { xs: '40px', md: '80px' },
               height: { xs: '40px', md: '80px' },
@@ -248,7 +211,9 @@ const TalentCard = ({ talentDetail }) => {
         <Container sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', my: '1rem' }}>
           <Button
             startIcon={<SimCardDownloadOutlined />}
-            onClick={() => handleDownloadCV(talentDetail.talentId, talentDetail.talentName)}
+            onClick={() => {
+              handleDownloadCVUrl({ cvUrl: talentDetail?.talentCvUrl, warn: warn });
+            }}
             sx={{ textTransform: 'none', fontFamily: 'Inter' }}
           >
             Download CV
@@ -256,12 +221,12 @@ const TalentCard = ({ talentDetail }) => {
           <Stack direction="row" spacing={2} sx={{ flexGrow: '1', justifyContent: 'flex-end' }}>
             <Button
               startIcon={<AddOutlined />}
-              onClick={() => handleAddToList(talentDetail.talentId, talentDetail.talentName)}
+              onClick={() => handleAddToList(talentDetail.talentId)}
               disabled={inWishlist}
               sx={{ textTransform: 'none', borderColor: '#2C8AD3', fontFamily: 'Inter' }}
               variant="outlined"
             >
-              Add to List
+              {inWishlist ? 'In Wishlist' : 'Add to List'}
             </Button>
             <Button
               endIcon={<KeyboardArrowRight />}
