@@ -17,7 +17,7 @@ const TalentTag = ({ tagTitle }) => {
   );
 };
 
-const TalentCard = ({ talentDetail, open, warn }) => {
+const TalentCard = ({ talentDetail, open, warn, success }) => {
   const totalPositions = talentDetail?.position?.length || 0;
   const totalSkills = talentDetail?.skillSet?.length || 0;
   const maxDisplayedItems = 2; // Ganti dengan jumlah item yang ingin ditampilkan
@@ -45,6 +45,9 @@ const TalentCard = ({ talentDetail, open, warn }) => {
       }
       const success = await addToWishlist(talentId, userId);
       updateTalentInWishlist(userId);
+      const successTitle = 'Talent added to wishlist!';
+      const successDescription = 'You can check your talent wishlist at "My Wishlist" menu';
+      success(successTitle, successDescription);
       open();
       console.log(success);
     } catch (error) {
@@ -212,7 +215,13 @@ const TalentCard = ({ talentDetail, open, warn }) => {
           <Button
             startIcon={<SimCardDownloadOutlined />}
             onClick={() => {
-              handleDownloadCVUrl({ cvUrl: talentDetail?.talentCvUrl, warn: warn });
+              handleDownloadCVUrl({
+                cvUrl: talentDetail?.talentCvUrl,
+                warn: warn,
+                talentName: talentDetail?.talentName,
+                success: success,
+                sucOpen: open,
+              });
             }}
             sx={{ textTransform: 'none', fontFamily: 'Inter' }}
           >

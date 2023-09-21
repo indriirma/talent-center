@@ -5,7 +5,11 @@ const dataArray = Cookies.get('loginRequirement');
 const cookieData = JSON.parse(dataArray || '[]');
 const userId = cookieData.userId;
 
-export const handleDownloadCV = ({ talentId, talentName }) => {
+export const handleDownloadCV = ({ talentId, talentName, warn }) => {
+  if (userId === undefined) {
+    warn();
+    return;
+  }
   downloadCV(talentId)
     .then((response) => {
       // The response data from the server is transformed into a Blob object
@@ -53,15 +57,24 @@ export const fetchDataWishlist = () => {
     });
 };
 
-export const handleDownloadCVUrl = ({ cvUrl, warn }) => {
+export const handleDownloadCVUrl = async ({ cvUrl, warn, talentName, success, sucOpen }) => {
   if (userId === undefined) {
     warn();
     return;
   }
+  const response = await fetch(cvUrl);
+  const blob = await response.blob();
+  const blobUrl = window.URL.createObjectURL(blob);
+
   const link = document.createElement('a');
-  link.href = cvUrl;
-  link.target = '_blank';
-  // link.download = 'CV.pdf';
+  link.href = blobUrl;
+  link.download = 'CV ' + talentName + '.pdf';
+  document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  window.URL.revokeObjectURL(blobUrl);
+  const successTitle = 'CV has been downloaded successfully!';
+  const successDescription = 'You can check it in your device';
+  success(successTitle, successDescription);
+  sucOpen();
 };

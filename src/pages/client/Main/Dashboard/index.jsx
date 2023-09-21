@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import SideBar from './Sidebar';
-import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typography, Button, Drawer } from '@mui/material';
+import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typography, Button, Drawer, LinearProgress } from '@mui/material';
 import SortYear from './SortYear';
 import ProfileCard from './ProfileCard';
 import { FilterAltOutlined, ArrowDropDownOutlined, Close } from '@mui/icons-material';
 import { fetchTalentList } from 'apis';
 import Cookies from 'js-cookie';
 import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const EntriesToggleButtonGroup = ({ value, onChange }) => {
   const entries = [10, 20, 50];
@@ -39,6 +39,7 @@ const EntriesToggleButtonGroup = ({ value, onChange }) => {
 const Main = () => {
   const bg_not_find_data = `${process.env.PUBLIC_URL}/resource/image/not-found-data.svg`;
 
+  const { state } = useLocation();
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
@@ -47,10 +48,10 @@ const Main = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
+  const [successTitle, setSuccessTitle] = useState('');
+  const [successDesc, setSuccessDesc] = useState('');
   const warnTitle = 'Access Forbidden!';
   const warnDescription = 'You should login first!';
-  const successTitle = 'Talent added to wishlist!';
-  const successDescription = 'You can check your talent wishlist at "My Wishlist" menu';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -90,6 +91,7 @@ const Main = () => {
   const userId = cookieData.userId;
 
   useEffect(() => {
+    console.log(state);
     setIsLoading(true);
     fetchTalentList(currentPage, entriesPerPage)
       .then((response) => {
@@ -115,11 +117,15 @@ const Main = () => {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
   };
+  const handleSuccessText = (title, description) => {
+    setSuccessTitle(title);
+    setSuccessDesc(description);
+  };
 
   return (
     <>
       <WarningAlert title={warnTitle} description={warnDescription} open={isWarning} close={handleCloseWarn} handleClick={navigateToSignIn} />
-      <SuccessAlert title={successTitle} description={successDescription} open={isModalOpen} close={handleClosePopup} />
+      <SuccessAlert title={successTitle} description={successDesc} open={isModalOpen} close={handleClosePopup} />
       <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
         <Navbar />
         <Stack direction="row" sx={{ backgroundColor: 'white' }}>
@@ -160,7 +166,9 @@ const Main = () => {
             </Drawer>
 
             {isLoading ? ( // Render loading indicator while data is being fetched
-              <div>Loading...</div>
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress />
+              </Box>
             ) : totalTalents !== 0 ? (
               <React.Fragment>
                 {/* <Box sx={{ display: { xs: 'flex', sm: 'none' }, mt: '2.5rem' }}>
@@ -176,7 +184,7 @@ const Main = () => {
                 <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
                   {displayedTalents.map((talent) => (
                     <Grid item xs={12} md={6} key={talent.talentId}>
-                      <ProfileCard talentDetail={talent} open={handleOpenPopup} warn={handleOpenWarn} />
+                      <ProfileCard talentDetail={talent} open={handleOpenPopup} warn={handleOpenWarn} success={handleSuccessText} />
                     </Grid>
                   ))}
                 </Grid>

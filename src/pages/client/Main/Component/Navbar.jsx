@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import {AppBar,Box,Toolbar,IconButton,Typography,Container,Autocomplete,TextField,Divider,Paper} from '@mui/material'; 
+import { AppBar, Box, Toolbar, IconButton, Typography, Container, Autocomplete, TextField, Divider, Paper } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'; 
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InboxIcon from '@mui/icons-material/Inbox';
-import LogoutIcon from '@mui/icons-material/Logout'; 
-import { Avatar,Menu,MenuItem,ListItemIcon } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { fetchSearchTags } from 'apis';
 
@@ -20,7 +20,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   const navigateToWishlist = () => {
-    //navigate('/wishlist');
+    navigate('/wishlist');
   };
 
   useEffect(() => {
@@ -156,10 +156,10 @@ function Navbar() {
               <SearchIcon />
             </IconButton>
           </Paper>
- 
+
           <IconButton
             sx={{
-              width:'50px',
+              width: '50px',
               position: 'absolute',
               right: 170,
               color: 'white',
@@ -181,8 +181,7 @@ function Navbar() {
             }}
           />
           <Divider
-            sx={{ color: 'white', height: 28, m: 0.5, position: 'absolute', right: 120, 
-            display: { xs: 'none', md: 'block' } }}
+            sx={{ color: 'white', height: 28, m: 0.5, position: 'absolute', right: 120, display: { xs: 'none', md: 'block' } }}
             orientation="vertical"
           />
 

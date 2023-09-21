@@ -3,26 +3,60 @@ import Navbar from '../Component/Navbar';
 import { ColumnInfo, TagInfo, LabelInfo } from './Component';
 import { fetchDataTalent } from 'apis';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Gallery } from './Gallery';
 import { Carousel } from './Carousel';
 import Cookies from 'js-cookie';
 import { FileDownload } from '@mui/icons-material';
 import { addToWishlist, fetchWishlist } from 'apis';
-import { handleDownloadCV } from 'pages/component/eventHandler';
+import { handleDownloadCVUrl } from 'pages/component/eventHandler';
 import { styled } from '@mui/material/styles';
+import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
 
 const Detail = () => {
   const [dataTalent, setDataTalent] = useState({});
   const [isWishlist, setIsWishlist] = useState(false);
   const [isGalOpen, setIsGalOpen] = useState(false);
   const [galIndex, setGalIndex] = useState(0);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [isWarnOpen, setIsWarnOpen] = useState(false);
+  const [successTitle, setSuccessTitle] = useState('');
+  const [successDesc, setSuccessDesc] = useState('');
+  const [warningTitle, setWarningTitle] = useState('');
+  const [warningDesc, setWarningDesc] = useState('');
+  const [page, setPage] = useState('');
+  const warnTitle = 'Access Forbidden!';
+  const warnDescription = 'You should login first!';
 
   const { id } = useParams();
+  const navigate = useNavigate();
 
+  const handleSuccessText = (title, desc) => {
+    setSuccessTitle(title);
+    setSuccessDesc(desc);
+  };
+
+  const handleWarningText = (title, desc) => {
+    setWarningTitle(title);
+    setWarningDesc(desc);
+  };
+
+  const handleLoginFirst = () => {
+    handleWarningText(warnTitle, warnDescription);
+    setPage('/client');
+    setIsWarnOpen(true);
+  };
+
+  const navigatePage = (page) => {
+    navigate(page);
+  };
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
   const userId = cookieData.userId;
+
+  const handleSuccOpen = async () => {
+    setIsSuccessOpen(true);
+  };
 
   const updateWishlist = async (userId) => {
     fetchWishlist(userId)
@@ -73,18 +107,25 @@ const Detail = () => {
 
   const handleAddtoList = async () => {
     try {
-      if (userId !== null) {
-        if (!dataTalent.talentId) {
-          console.error('Talent ID is missing or invalid');
-          return;
-        }
-        const success = await addToWishlist(dataTalent.talentId, userId);
-        console.log(success);
-        updateWishlist(userId);
-      } else {
-        console.error('You should login first');
+      if (userId === undefined) {
+        handleLoginFirst();
         return;
       }
+      if (!dataTalent.talentId) {
+        const title = 'Talent Not Found!';
+        const descrip = 'You should choose one of Talents';
+        handleWarningText(title, descrip);
+        setPage('/client/main');
+        setIsWarnOpen(true);
+        return;
+      }
+      const success = await addToWishlist(dataTalent.talentId, userId);
+      console.log(success);
+      updateWishlist(userId);
+      const successTitle = 'Talent added to wishlist!';
+      const successDescription = 'You can check your talent wishlist at "My Wishlist" menu';
+      handleSuccessText(successTitle, successDescription);
+      setIsSuccessOpen(true);
     } catch (error) {
       console.error(error);
     }
@@ -107,6 +148,25 @@ const Detail = () => {
 
   return (
     <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
+      <WarningAlert
+        title={warningTitle}
+        description={warningDesc}
+        open={isWarnOpen}
+        close={() => {
+          setIsWarnOpen(false);
+        }}
+        handleClick={() => {
+          navigatePage(page);
+        }}
+      />
+      <SuccessAlert
+        title={successTitle}
+        description={successDesc}
+        open={isSuccessOpen}
+        close={() => {
+          setIsSuccessOpen(false);
+        }}
+      />
       <Navbar />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <Container sx={{ boxShadow: '0px 5px 20px 0px rgba(0,0,0,0.10)', borderRadius: '10px', paddingTop: '20px', paddingBottom: '20px' }}>
@@ -125,7 +185,13 @@ const Detail = () => {
                 </Button>
                 <Button
                   onClick={() => {
-                    handleDownloadCV({ talentId: dataTalent.talentId, talentName: dataTalent.talentName });
+                    handleDownloadCVUrl({
+                      cvUrl: dataTalent.talentCvUrl,
+                      warn: handleLoginFirst,
+                      talentName: dataTalent.talentName,
+                      success: handleSuccessText,
+                      sucOpen: handleSuccOpen,
+                    });
                   }}
                   startIcon={<FileDownload />}
                   sx={{ textTransform: 'none', color: '#848484', backgroundColor: 'white', fontFamily: 'Inter', my: '0.5rem', width: '100%' }}

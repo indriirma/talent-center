@@ -3,12 +3,18 @@ import { TextField, IconButton, Paper } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Autocomplete from '@mui/material/Autocomplete';
 import { fetchSearchTags } from 'apis';
-
+import { useNavigate } from 'react-router-dom';
 
 const SearchBox = () => {
   const [list, setList] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const navigate = useNavigate();
+
+  const handleSearchClick = () => {
+    const skillsetIdArr = selectedOptions.map((item) => item.skillsetId).join(',');
+    navigate('main', { state: { skillsetIdArr } });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +47,7 @@ const SearchBox = () => {
           width: '328px',
           height: '48px',
           borderRadius: '36px',
-        },        
+        },
       }}
     >
       <Autocomplete
@@ -52,7 +58,7 @@ const SearchBox = () => {
         options={list}
         getOptionLabel={(option) => option.skillsetName}
         onChange={(event, newValue) => {
-          setSelectedOptions(newValue); // set new value 
+          setSelectedOptions(newValue); // set new value
         }}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
@@ -84,7 +90,7 @@ const SearchBox = () => {
           </Paper>
         )}
       />
-      <IconButton type="button" sx={{ mr: 3, color: '#C4C4C4' }} aria-label="search">
+      <IconButton type="button" onClick={handleSearchClick} sx={{ mr: 3, color: '#C4C4C4' }} aria-label="search">
         <SearchIcon />
       </IconButton>
     </Paper>
