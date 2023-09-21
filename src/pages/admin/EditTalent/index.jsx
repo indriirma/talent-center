@@ -22,8 +22,6 @@ import {
 } from '@mui/material';
 import WestIcon from '@mui/icons-material/West';
 import IconButton from '@mui/material/IconButton';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -33,7 +31,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getLevels, getEmployeeStatus, getSkills } from '../../../apis';
-
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -108,7 +105,7 @@ export default function EditTalent() {
   });
   const navigate = useNavigate();
 
-  // console.log(talentData);
+  // console.log(talentData?.talentName);
 
   const { data: levelOptions, loading: levelLoading } = useApiData(getLevels);
   const { data: employeeStatusOptions, loading: employeeStatusLoading } = useApiData(getEmployeeStatus);
@@ -142,15 +139,13 @@ export default function EditTalent() {
     fontWeight: 700,
   };
 
-   const {talentId} = useParams();
-   const apiUrl = `http://localhost:8080/api/talent-management/talents/${talentId}`;
+  const { talentId } = useParams();
+  const apiUrl = `http://localhost:8080/api/talent-management/talents/${talentId}`;
 
   const handleFileImageChange = (event) => {
     const file = event.target.files[0];
-    // setSelectedFileImage(file);
     setSelectedForm({ ...selectedForm, talentPhoto: file });
 
-    // Menghasilkan pratinjau gambar
     const reader = new FileReader();
     reader.onload = () => {
       setPreviewImage(reader.result);
@@ -160,14 +155,12 @@ export default function EditTalent() {
 
   const handleFileCVChange = (event) => {
     const file = event.target.files[0];
-    // setSelectedFileCV(file);
     setSelectedForm({ ...selectedForm, cv: file });
 
     console.log(file);
   };
 
   const handlePaperImageClick = () => {
-    // Simulasi klik pada input file saat kotak Paper diklik
     const fileInput = document.getElementById('fileImageInput');
     if (fileInput) {
       fileInput.click();
@@ -182,23 +175,21 @@ export default function EditTalent() {
   };
 
   const handleDeleteImageClick = () => {
-    // setSelectedFileImage(null);
     setSelectedForm({ ...selectedForm, talentPhoto: null });
     setPreviewImage(null);
   };
 
   const handleDeleteCVClick = () => {
-    // setSelectedFileCV(null);
     setSelectedForm({ ...selectedForm, cv: null });
   };
 
   const handleNamaTalentChange = (nama) => {
     if (nama.length <= 255) {
-      if (talentData) {
-        setTalentData({ ...talentData, talentName: nama });
-      } else {
+      // if (talentData) {
+      //   setTalentData({ ...talentData, talentName: nama });
+      // } else {
         setSelectedForm({ ...selectedForm, talentName: nama });
-      }
+      // }
     }
   };
 
@@ -217,7 +208,6 @@ export default function EditTalent() {
   };
 
   const handleExperienceChange = (newValue) => {
-    // const newValue = event.target.value;
     if (newValue === '') {
       setSelectedForm({ ...selectedForm, experience: null });
     } else if (/^\d+$/.test(newValue)) {
@@ -270,9 +260,9 @@ export default function EditTalent() {
       formData.append('cellphone', selectedForm.cellphone);
       formData.append('employeeStatusId', selectedForm.employeeStatusId);
       formData.append('videoUrl', selectedForm.videoUrl);
-      formData.append('positionIds', selectedForm.position.join(',')); // Assuming position is an array
+      formData.append('positionIds', selectedForm.position.join(','));
 
-      const response = await axios.post('http://localhost:8080/api/talent-management/talents', formData, {
+      const response = await axios.put(apiUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -284,18 +274,48 @@ export default function EditTalent() {
     }
   };
 
+  // useEffect(() => {
+  //   axios
+  //     .get(apiUrl)
+  //     .then((response) => {
+  //       const data = response.data;
+  //       setTalentData(data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('There was a problem fetching talent data:', error);
+  //     });
+  // }, []);
+
   useEffect(() => {
     axios
       .get(apiUrl)
       .then((response) => {
         const data = response.data;
         setTalentData(data);
+  
+        // Set default values based on talentData
+        setSelectedForm({
+          talentPhoto: data?.talentPhotoUrl || null,
+          talentName: data?.talentName || '',
+          nip: data?.employeeNumber || '',
+          sex: data?.sex || '',
+          dob: data?.birthDate || '',
+          talentDescription: data?.about || '',
+          cv: data?.talentCvUrl || null,
+          experience: data?.talentExperience || '',
+          levelId: data?.talentLevelId || '',
+          skillSet: data?.skillSet?.map((skill) => skill.skillsetId) || [],
+          position: [1],
+          email: data?.email || '',
+          cellphone: data?.cellphone || '',
+          employeeStatusId: data?.employeeStatusId || '1',
+          videoUrl: data?.biographyVideoUrl || '',
+        });
       })
       .catch((error) => {
         console.error('There was a problem fetching talent data:', error);
       });
-  }, []);
-
+  }, [apiUrl]);
 
   return (
     <AdminLayout>
@@ -317,12 +337,7 @@ export default function EditTalent() {
                 <Grid item marginLeft={3}>
                   <Stack direction="row" spacing={3}>
                     <Stack direction="row" spacing={3}>
-                      <Avatar
-                        //src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80"
-                        src={talentData?.talentPhotoUrl}
-                        variant="rounded"
-                        sx={{ width: '100px', height: '100px' }}
-                      />
+                      <Avatar src={talentData?.talentPhotoUrl} variant="rounded" sx={{ width: '100px', height: '100px' }} />
                       <Typography noWrap sx={{ fontFamily: 'Roboto', fontWeight: 700, fontSize: '24px' }}>
                         {talentData?.talentName}
                       </Typography>
@@ -333,11 +348,11 @@ export default function EditTalent() {
                     </Stack>
                   </Stack>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <Button variant="outlined" startIcon={<ModeEditIcon />} sx={{ textTransform: 'none', borderColor: '#2C8AD3' }}>
-                    Edit Profile
+                    Simpan Perubahan
                   </Button>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
             <Divider />
@@ -353,7 +368,7 @@ export default function EditTalent() {
                   <Stack spacing={1}>
                     <Typography sx={headText}>Nama Talent</Typography>
                     <TextField
-                      value={talentData ? talentData.talentName : selectedForm.talentName}
+                      value={selectedForm.talentName}
                       onChange={(e) => handleNamaTalentChange(e.target.value)}
                       id="talent_name"
                       placeholder="Masukkan Nama Talent"
@@ -452,7 +467,7 @@ export default function EditTalent() {
                   {selectedForm.cv || talentData?.talentCv !== null ? (
                     <>
                       <Typography>
-                      {selectedForm.cv ? selectedForm.cv.name : talentData?.talentCv}{' '}
+                        {selectedForm.cv ? selectedForm.cv.name : talentData?.talentCv}{' '}
                         <IconButton onClick={handleDeleteCVClick}>
                           <ClearIcon />
                         </IconButton>
@@ -461,7 +476,7 @@ export default function EditTalent() {
                   ) : (
                     <>
                       <div>
-                        <PictureAsPdfIcon sx={{ color: '#FF001F', fontSize: '250%' }} /> 
+                        <PictureAsPdfIcon sx={{ color: '#FF001F', fontSize: '250%' }} />
                       </div>
                       <Typography>Drag and drop file here or click to upload</Typography>
                     </>
@@ -520,7 +535,9 @@ export default function EditTalent() {
                         <FormControlLabel
                           control={
                             <Checkbox
-                              checked={selectedForm.skillSet.includes(skillOption.skillsetId) || talentData?.skillSet.includes(skillOption.skillsetId) || ''}
+                              checked={
+                                selectedForm.skillSet.includes(skillOption.skillsetId) || talentData?.skillSet.includes(skillOption.skillsetId) || ''
+                              }
                               onChange={(event) => handleSkillChange(skillOption.skillsetId, event.target.checked)}
                             />
                           }
@@ -572,6 +589,14 @@ export default function EditTalent() {
                   size="small"
                 />
               </Stack>
+              <Box sx={{ mb: '20px', mt: '20px', display: 'flex', justifyContent: 'end' }}>
+                <Button variant="contained" sx={{ mr: 2, background: '#C4C4C4', color: '#FFFFFF', '&:hover': { backgroundColor: '#C4C4C4' } }}>
+                  Batal
+                </Button>
+                <Button variant="contained" onClick={handleSubmit}>
+                  Simpan Perubahan
+                </Button>
+              </Box>
             </CustomTabPanel>
             <Divider />
             <CustomTabPanel value={value} index={1}>

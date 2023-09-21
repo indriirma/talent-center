@@ -25,6 +25,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from 'axios';
 import { getAllTalent } from 'apis';
 import { useNavigate } from 'react-router-dom';
+import AdminLayout from 'layouts/AdminLayout';
 
 const buttonEntriesStyle = {
   marginRight: '4px',
@@ -66,28 +67,33 @@ const DaftarTalents = () => {
 
   axios.defaults.withCredentials = true;
 
-  const getDataTalents = (name, sortBy) => {
-    getAllTalent(name, sortBy)
-      .then((res) => {
-        console.log(res);
-        setDataTalents(res.data.content);
-      })
-      .catch((err) => {
-        console.log('err', err);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/talent-management/talents`, {
+        params: {
+          sortBy: request.sortBy,
+          page: page -1,
+          size: entries,
+          talentName: request.name,
+        },
       });
+      setDataTalents(response.data.content);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const getDataTalents = () => {
+    fetchData();
   };
 
   const handleChangeEntries = (value) => {
     setEntries(value);
-    setPage(0);
-    setStartIndex(0);
-    setEndIndex(value - 1);
+    setPage(1);
   };
 
   const handleChangePage = (event, value) => {
     setPage(value);
-    setStartIndex(value * entries - 10);
-    setEndIndex(value * entries + (entries - 1) - 10);
   };
 
   const handleChangeSelect = (event) => {
@@ -112,28 +118,20 @@ const DaftarTalents = () => {
   };
 
   const handleDetail = (talentId) => {
-    // Assuming you have a route for talent detail page, navigate to it
     navigate(`/admin/detail-talent/${talentId}`);
   };
 
   const handleEdit = (talentId) => {
-    // Assuming you have a route for talent detail page, navigate to it
     navigate(`/admin/edit-talent/${talentId}`);
   };
 
   useEffect(() => {
-    console.log('startIndex', startIndex);
-    console.log('endIndex', endIndex);
-    console.log('request', request);
-  }, [startIndex, endIndex, request]);
-
-  useEffect(() => {
-    getDataTalents(request.name, request.sortBy);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchData();
+  }, [page, entries, request]);
+  
 
   return (
-    <>
+    <AdminLayout>
       <Typography
         sx={{ color: '#3B4758', fontFamily: 'Poppins', fontSize: '22px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', mb: '24px' }}
       >
@@ -199,7 +197,7 @@ const DaftarTalents = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {dataTalents.slice(startIndex, endIndex + 1).map((row, index) => (
+              {dataTalents.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell sx={colorHitamStyle}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -281,10 +279,10 @@ const DaftarTalents = () => {
               50
             </Button>
           </div>
-          <Pagination count={Math.ceil(dataTalents.length / entries)} page={page} onChange={handleChangePage} />
+          <Pagination count={Math.ceil(dataTalents.length)} page={page} onChange={handleChangePage} />
         </div>
       </Box>
-    </>
+    </AdminLayout>
   );
 };
 

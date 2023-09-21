@@ -34,9 +34,6 @@ import ComboBoxLang from 'components/admin/ComboBoxLang';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getLevels, getEmployeeStatus, getSkills } from '../../apis';
@@ -109,7 +106,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   },
 }));
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 // Custom hook to fetch data from an API endpoint and manage related state
@@ -280,12 +276,12 @@ export default function Talent() {
       formData.append('experience', selectedForm.experience);
       formData.append('statusId', 1);
       formData.append('levelId', selectedForm.levelId);
-      formData.append('skillIds', selectedForm.skillSet); // Assuming skillSet is an array
+      formData.append('skillIds', selectedForm.skillSet);
       formData.append('email', selectedForm.email);
       formData.append('cellphone', selectedForm.cellphone);
       formData.append('employeeStatusId', selectedForm.employeeStatusId);
       formData.append('videoUrl', selectedForm.videoUrl);
-      formData.append('positionIds', selectedForm.position.join(',')); // Assuming position is an array
+      formData.append('positionIds', selectedForm.position.join(','));
 
       const response = await axios.post('http://localhost:8080/api/talent-management/talents', formData, {
         headers: {

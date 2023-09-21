@@ -207,6 +207,12 @@ export default function BasicTable() {
       });
   }, []);
 
+   const rowsPerPage = 10; 
+
+   const startIndex = (page - 1) * rowsPerPage;
+   const endIndex = startIndex + rowsPerPage;
+   const visibleRows = rows.slice(startIndex, endIndex);
+
   return (
     <React.Fragment>
       {/* <Paper> */}
@@ -274,12 +280,16 @@ export default function BasicTable() {
             </Typography>
             <TablePageEntries></TablePageEntries>
           </Stack>
-          <Pagination count={10} page={page} onChange={handleChange}></Pagination>
+          {/* <Pagination count={Math.ceil(rows.length)} page={page} onChange={handleChange} /> */}
+          <Pagination
+        count={Math.ceil(rows.length)} // Calculate the number of pages
+        page={page}
+        onChange={handleChange}
+      />
         </Stack>
       </TableContainer>
 
       <Dialog open={dialogApproveOpen} onClose={handleCloseDialogApprove} style={{ width: '100%' }}>
-        {/* <DialogTitle style={{color: '#3B4648', fontSize: '18px', fontFamily: 'Poppins', fontWeight: '600', lineHeight: '22px', wordWrap: 'break-word'}}>{'Approve'}</DialogTitle> */}
         <DialogTitle
           style={{
             display: 'flex',
@@ -463,18 +473,6 @@ export default function BasicTable() {
           Approval successful
         </Alert>
       )}
-
-      {/* <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rpg}
-          page={pg}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
-
-      {/* </Paper> */}
     </React.Fragment>
   );
 }

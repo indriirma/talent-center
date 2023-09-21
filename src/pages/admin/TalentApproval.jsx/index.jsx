@@ -194,12 +194,11 @@ export default function TalentApproval() {
               {/* Autocomplete Search */}
               <Grid item xs={12} sm={6} md={4} lg={4}>
                 <AutocompleteTalentApproval key="autocomplete-talent-approval" style={{ width: '100%' }} />{' '}
-                {/* Set width to 100% for mobile layout */}
               </Grid>
 
               {/* Autocomplete Select */}
               <Grid item xs={12} sm={6} md={2} lg={2}>
-                <ComboBoxSortBy style={{ width: '100%' }} /> {/* Set width to 100% for mobile layout */}
+                <ComboBoxSortBy style={{ width: '100%' }} />
               </Grid>
 
               <Grid item xs={12}>

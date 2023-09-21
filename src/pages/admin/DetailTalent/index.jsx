@@ -39,9 +39,30 @@ function a11yProps(index) {
   };
 }
 
-const skillSet = ['Java', 'Laravel', 'Php', 'FrontEnd'];
-
 export default function DetailTalent() {
+  async function downloadCVByTalentId(talentId) {
+    try {
+      const response = await axios.post(`http://localhost:8080/api/talent-management/talents/download-cv?talentId=${talentId}`, null, {
+        responseType: 'blob',
+      });
+
+      if (response.status === 200) {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'CV.pdf');
+
+        document.body.appendChild(link);
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Gagal mengunduh CV:', error);
+    }
+  }
+
   const [value, setValue] = React.useState(0);
   const [talentData, setTalentData] = useState(null);
   const navigate = useNavigate();
@@ -92,7 +113,6 @@ export default function DetailTalent() {
   console.log(talentData);
 
   const handleEdit = (talentId) => {
-    // Assuming you have a route for talent detail page, navigate to it
     navigate(`/admin/edit-talent/${talentId}`);
   };
 
@@ -188,12 +208,23 @@ export default function DetailTalent() {
             </CustomTabPanel>
             <Divider />
             <CustomTabPanel value={value} index={0}>
+              {/* <Stack spacing={1}>
+                <Typography sx={{ headText }}>CV</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<NoteAddIcon />}
+                  sx={{ backgroundColor: '#2C8AD3', color: 'white', textTransform: 'none', width: '150px', height: '40px' }}
+                >
+                  Download CV
+                </Button>
+              </Stack> */}
               <Stack spacing={1}>
                 <Typography sx={{ headText }}>CV</Typography>
                 <Button
                   variant="contained"
                   startIcon={<NoteAddIcon />}
                   sx={{ backgroundColor: '#2C8AD3', color: 'white', textTransform: 'none', width: '150px', height: '40px' }}
+                  onClick={() => downloadCVByTalentId(talentData?.talentId)}
                 >
                   Download CV
                 </Button>

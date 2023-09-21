@@ -20,6 +20,7 @@ import DetailTalent from './admin/DetailTalent';
 import TalentApproval from './admin/TalentApproval.jsx';
 import Talent from './admin';
 import EditTalent from './admin/EditTalent';
+import TambahT from './admin/Talent';
 
 const routes: SecurableRoute[] = [
   {
@@ -98,7 +99,7 @@ const routes: SecurableRoute[] = [
       },
       {
         path: 'daftar-talent',
-        element: <DashboardLayout />,
+        //element: <DashboardLayout />,
         children: [
           {
             index: true,
@@ -108,7 +109,7 @@ const routes: SecurableRoute[] = [
       },
       {
         path: 'tambah-talent',
-        element: <DashboardLayout />,
+        // element: <DashboardLayout />,
         children: [
           {
             index: true,
@@ -148,11 +149,11 @@ const routes: SecurableRoute[] = [
       },
       {
         path: 'talent',
-        // element: <DashboardLayout />,
         children: [
           {
             index: true,
-            element: <Talent />,
+            // element: <Talent />,
+            element: <TambahT />,
           },
         ],
       },

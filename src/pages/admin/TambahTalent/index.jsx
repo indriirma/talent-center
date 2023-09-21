@@ -1,105 +1,199 @@
-import { ArrowBack } from '@mui/icons-material';
-import AddPhotoIcon from '@mui/icons-material/AddPhotoAlternate';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import React, { useEffect, useState } from 'react';
+import AdminLayout from '../../../layouts/AdminLayout';
 import {
+  Typography,
   Box,
   Button,
-  Card,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
+  InputAdornment,
   Grid,
+  Card,
+  Stack,
+  Divider,
+  TextField,
+  Checkbox,
+  FormControlLabel,
   IconButton,
-  Input,
+  MenuItem,
+  Paper,
   Radio,
   RadioGroup,
   Select,
-  TextField,
-  Typography,
 } from '@mui/material';
+import WestIcon from '@mui/icons-material/West';
+import { useNavigate } from 'react-router-dom';
+import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ClearIcon from '@mui/icons-material/Clear';
+import { getLevels, getEmployeeStatus, getSkills } from '../../../apis';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 
-function TambahTalent() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [selectedFile, setSelectedFile] = useState('');
-  const [talentName, setTalentName] = useState('');
-  const [nip, setNip] = useState('');
-  const [sex, setSex] = useState('');
-  const [birthdate, setBirthdate] = useState('');
-  const [descTalent, setDescTalent] = useState('');
-  const [selectedCv, setSelectedCv] = useState('');
-  const [experience, setExperience] = useState('');
-  const [talentLevels, setTalentLevels] = useState([]);
-  const [selectedTalentLevel, setSelectedTalentLevel] = useState('');
-  const [skillSetOptions, setSkillSetOptions] = useState([]);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [email, setEmail] = useState('');
-  const [noHp, setNoHp] = useState('');
-  const [employeeStatuses, setEmployeeStatuses] = useState([]);
-  const [selectedEmpStatus, setSelectedEmpStatus] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
+// Custom hook to fetch data from an API endpoint and manage related state
+function useApiData(apiFunction) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch talent levels, employee statuses, and skill set options
-    const apiUrlLevel = 'http://localhost:8080/api/master-management/talent-level-option-lists';
-    const apiUrlStatus = 'http://localhost:8080/api/master-management/employee-status-option-lists';
-    const apiUrlSkill = 'http://localhost:8080/api/master-management/skill-set-option-lists';
-
-    axios
-      .all([axios.get(apiUrlLevel), axios.get(apiUrlStatus), axios.get(apiUrlSkill)])
-      .then(
-        axios.spread((levelResponse, statusResponse, skillResponse) => {
-          setTalentLevels(levelResponse.data);
-          setEmployeeStatuses(statusResponse.data);
-          setSkillSetOptions(skillResponse.data);
-        })
-      )
-      .catch((error) => {
+    async function fetchData() {
+      try {
+        const response = await apiFunction();
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
         console.error('Error fetching data:', error);
-      });
-  }, []);
+        setLoading(false);
+      }
+    }
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    console.log('Selected file:', event.target.files[0]);
+    fetchData();
+  }, [apiFunction]);
+
+  return { data, loading };
+}
+
+export default function TambahTalent() {
+  const [previewImage, setPreviewImage] = useState(null);
+  const [selectedForm, setSelectedForm] = useState({
+    talentPhoto: null,
+    talentName: 'Fimela',
+    nip: '1234567890',
+    sex: '',
+    dob: '',
+    talentDescription: 'Software Developer',
+    cv: null,
+    experience: '5',
+    levelId: '',
+    skillSet: [],
+    position: [1],
+    email: 'fimela@example.com',
+    cellphone: '085720071234',
+    employeeStatusId: '',
+    videoUrl: 'https://www.youtube.com/',
+  });
+  const navigate = useNavigate();
+
+  const { data: levelOptions, loading: levelLoading } = useApiData(getLevels);
+  const { data: employeeStatusOptions, loading: employeeStatusLoading } = useApiData(getEmployeeStatus);
+  const { data: skillSetOptions, loading: skillSetLoading } = useApiData(getSkills);
+
+  const handleFileImageChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedForm({ ...selectedForm, talentPhoto: file });
+
+    // pratinjau gambar
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleCVFileChange = async (event) => {
-    setSelectedCv(event.target.files[0]);
-    console.log('handleCVFileChange : ', event.target.files[0].name);
+  const handleFileCVChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedForm({ ...selectedForm, cv: file });
+
+    console.log(file);
   };
 
-  const handleSkillChange = (skillId) => {
-    if (selectedSkills.includes(skillId)) {
-      setSelectedSkills(selectedSkills.filter((id) => id !== skillId));
+  const handlePaperImageClick = () => {
+    const fileInput = document.getElementById('fileImageInput');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const handlePaperCVClick = () => {
+    const fileInput = document.getElementById('fileCVInput');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const handleDeleteImageClick = () => {
+    setSelectedForm({ ...selectedForm, talentPhoto: null });
+    setPreviewImage(null);
+  };
+
+  const handleDeleteCVClick = () => {
+    setSelectedForm({ ...selectedForm, cv: null });
+  };
+
+  const handleNamaTalentChange = (event) => {
+    let nama = event.target.value;
+    if (nama.length <= 255) {
+      setSelectedForm({ ...selectedForm, talentName: nama });
+    }
+  };
+
+  const handleDescChange = (event) => {
+    let desc = event.target.value;
+    if (desc.length <= 255) {
+      setSelectedForm({ ...selectedForm, talentDescription: desc });
+    }
+  };
+
+  const handleNIPChange = (event) => {
+    let newnip = event.target.value;
+    if (newnip.length <= 50) {
+      setSelectedForm({ ...selectedForm, nip: newnip });
+    }
+  };
+
+  const handleExperienceChange = (event) => {
+    const newValue = event.target.value;
+    if (newValue === '') {
+      setSelectedForm({ ...selectedForm, experience: null });
+    } else if (/^\d+$/.test(newValue)) {
+      const intValue = parseInt(newValue, 10);
+      console.log(intValue);
+      if (intValue <= 10) {
+        setSelectedForm({ ...selectedForm, experience: intValue });
+      }
+    }
+  };
+
+  const handleSkillChange = (skill, checked) => {
+    let currSkill = [...selectedForm.skillSet];
+
+    if (checked) {
+      currSkill.push(skill);
     } else {
-      setSelectedSkills([...selectedSkills, skillId]);
+      currSkill = currSkill.filter((s) => s !== skill);
+    }
+
+    setSelectedForm({ ...selectedForm, skillSet: currSkill });
+  };
+
+  const handleNoHpChange = (event) => {
+    const newValue = event.target.value;
+    if (newValue === '') {
+      setSelectedForm({ ...selectedForm, cellphone: null });
+    } else if (/^\d+$/.test(newValue)) {
+      if (newValue.length <= 13) {
+        setSelectedForm({ ...selectedForm, cellphone: newValue });
+      }
     }
   };
 
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
-      formData.append('talentPhoto', selectedFile);
-      formData.append('cv', selectedCv);
-      formData.append('talentName', talentName);
-      formData.append('nip', nip);
-      formData.append('sex', sex);
-      formData.append('dob', birthdate);
-      formData.append('talentDescription', descTalent);
-      formData.append('experience', experience);
+      formData.append('talentPhoto', selectedForm.talentPhoto);
+      formData.append('cv', selectedForm.cv);
+      formData.append('talentName', selectedForm.talentName);
+      formData.append('nip', selectedForm.nip);
+      formData.append('sex', selectedForm.sex);
+      formData.append('dob', selectedForm.dob);
+      formData.append('talentDescription', selectedForm.talentDescription);
+      formData.append('experience', selectedForm.experience);
       formData.append('statusId', 1);
-      formData.append('levelId', selectedTalentLevel);
-      formData.append('skillIds', selectedSkills);
-      formData.append('email', email);
-      formData.append('cellphone', noHp);
-      formData.append('employeeStatusId', selectedEmpStatus);
-      formData.append('videoUrl', videoUrl);
-      formData.append('positionIds', 1);
+      formData.append('levelId', selectedForm.levelId);
+      formData.append('skillIds', selectedForm.skillSet);
+      formData.append('email', selectedForm.email);
+      formData.append('cellphone', selectedForm.cellphone);
+      formData.append('employeeStatusId', selectedForm.employeeStatusId);
+      formData.append('videoUrl', selectedForm.videoUrl);
+      formData.append('positionIds', selectedForm.position.join(','));
 
       const response = await axios.post('http://localhost:8080/api/talent-management/talents', formData, {
         headers: {
@@ -113,427 +207,301 @@ function TambahTalent() {
     }
   };
 
+  useEffect(() => {
+    console.log('selected Form', selectedForm);
+  }, [selectedForm]);
+
   return (
-    <Grid container alignItems="center" spacing={1}>
-      <Grid item>
-        <Button
-          sx={{
-            fontFamily: 'Poppins',
-            fontWeight: '100',
-            fontSize: '17px',
-            marginLeft: '10px',
-            verticalAlign: 'middle',
-            color: 'black',
-          }}
-          startIcon={<ArrowBack />}
-          onClick={() => navigate('/admin/daftar-talent')}
-        >
-          Kembali
-        </Button>
-      </Grid>
-      <Grid item xs={12} sm={12} sx={{ marginTop: '20px' }}>
-        <Card sx={{ backgroundColor: '#fff', padding: '20px', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
-          <Typography
-            sx={{
-              fontFamily: 'Poppins',
-              fontWeight: '100',
-              fontSize: '20px',
-              marginLeft: '10px',
-              verticalAlign: 'middle',
-            }}
-          >
-            Tambah Talent
-          </Typography>
-        </Card>
-        <form action="POST" encType="multipart/form-data">
-          <Card sx={{ backgroundColor: '#fff', padding: '20px', marginTop: '5px' }}>
-            <Grid item xs={3} sm={3}>
-              <Typography
-                variant="h6"
+    <AdminLayout>
+      <Box>
+        <Stack direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton aria-label="delete">
+            <WestIcon onClick={() => navigate('/admin/daftar-talent')} sx={{ color: '#3B4758' }} />
+          </IconButton>
+          <Typography sx={{ fontSize: '16px', fontWeight: 700, color: '#3B4758', fontFamily: 'Roboto' }}>Kembali</Typography>
+        </Stack>
+        <Card sx={{ marginTop: 3 }}>
+          <Box sx={{ margin: 3 }}>
+            <Typography sx={{ fontFamily: 'Roboto', fontSize: '18px', fontWeight: 500 }}>Tambah Talent</Typography>
+          </Box>
+          <Divider />
+          {/* Main */}
+          <Grid item xs={12} sm={6} md={4} lg={4}>
+            <Box sx={{ background: '#FFF', padding: 2, borderRadius: '0px 0px 12px 12px' }}>
+              {/* Talent Photo */}
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Talent‘s Photo</Typography>
+              <input type="file" accept=".jpg, .jpeg, .png" onChange={handleFileImageChange} style={{ display: 'none' }} id="fileImageInput" />
+              <Paper
+                elevation={0}
                 sx={{
-                  fontFamily: 'Poppins',
-                  fontWeight: '500',
-                  fontSize: '18px',
-                  marginBottom: '10px',
-                }}
-              >
-                Talent Photo's
-              </Typography>
-              <Box
-                component="span"
-                sx={{
-                  p: 2,
-                  border: '1px dashed blue',
+                  borderRadius: '10px',
+                  border: '2px dashed #000',
+                  textAlign: 'center',
+                  width: '100px',
+                  height: '100px',
+                  borderColor: '#2C8AD3',
+                  background: '#EEF0F4',
+                  color: '#2C8AD3',
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  background: 'lightgrey',
-                  borderRadius: '5px',
-                  maxWidth: '100px',
-                  width: '100%',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
                 }}
+                onClick={handlePaperImageClick}
               >
-                <label htmlFor="photo-input">
-                  <IconButton color="primary" aria-label="upload photo" component="span">
-                    <AddPhotoIcon sx={{ fontSize: 48 }} />
-                  </IconButton>
-                </label>
-                <input type="file" id="photo-input" onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={12}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'Roboto',
-                  fontWeight: '500',
-                  fontSize: '18px',
-                  marginBottom: '10px',
-                  marginTop: '15px',
-                }}
-              >
-                Nama Talent
-              </Typography>
+                {previewImage ? (
+                  <>
+                    <IconButton
+                      onClick={handleDeleteImageClick}
+                      sx={{
+                        position: 'absolute',
+                        top: '1px',
+                        right: '1px',
+                        color: '#FF0000',
+                        background: '#FDFDFD',
+                        borderRadius: '1px',
+                        width: '1px',
+                        height: '1px',
+                      }}
+                    >
+                      <DeleteRoundedIcon sx={{ width: '20px', height: '20px' }} />
+                    </IconButton>
+                    <img src={previewImage} alt="Pratinjau Gambar" style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '10px' }} />
+                  </>
+                ) : (
+                  <AddPhotoAlternateRoundedIcon />
+                )}
+              </Paper>
+              {/* End Talent Photo */}
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Nama Talent</Typography>
               <TextField
-                id="filled"
-                fullWidth
+                value={selectedForm.talentName}
+                onChange={handleNamaTalentChange}
+                id="talent_name"
                 placeholder="Masukkan Nama Talent"
-                onChange={(e) => setTalentName(e.target.value)}
-                value={talentName}
+                variant="outlined"
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
               />
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: 'Roboto',
-                  fontWeight: '500',
-                  fontSize: '18px',
-                  marginBottom: '10px',
-                  marginTop: '15px',
-                }}
-              >
-                Nomor Induk Pegawai
-              </Typography>
-              <TextField id="filled" fullWidth placeholder="Masukkan Nomor Induk Pegawai" onChange={(e) => setNip(e.target.value)} value={nip} />
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Jenis Kelamin
-                  </Typography>
-                  <FormControl>
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Nomor Induk Pegawai</Typography>
+              <TextField
+                value={selectedForm.nip}
+                onChange={handleNIPChange}
+                id="nip"
+                placeholder="Masukkan Nomor Induk Pegawai"
+                variant="outlined"
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
+              />
+
+              <Box sx={{ flexGrow: 1, mb: '5px', mt: '20px' }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography sx={{ mb: '5px' }}>Jenis Kelamin</Typography>
                     <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="female"
                       name="radio-buttons-group"
-                      onChange={(e) => setSex(e.target.value)}
-                      value={sex}
+                      value={selectedForm.sex}
+                      onChange={(event) => setSelectedForm({ ...selectedForm, sex: event.target.value })}
                     >
                       <FormControlLabel value="L" control={<Radio />} label="Laki-laki" />
                       <FormControlLabel value="P" control={<Radio />} label="Perempuan" />
                     </RadioGroup>
-                  </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography sx={{ mb: '5px' }}>Tanggal Lahir</Typography>
+                    <TextField
+                      fullWidth
+                      id="birthDate"
+                      // label="Birth Date"
+                      name="birthDate"
+                      type="date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      value={selectedForm.dob}
+                      onChange={(e) => setSelectedForm({ ...selectedForm, dob: e.target.value })}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Tanggal Lahir
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="birthDate"
-                    // label="Birth Date"
-                    name="birthDate"
-                    type="date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange={(e) => setBirthdate(e.target.value)}
-                    value={birthdate}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  {/* Deskripsi Talent */}
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Deskripsi Talent
-                  </Typography>
-                  <TextField
-                    id="deskripsi"
-                    fullWidth
-                    multiline
-                    placeholder="Masukkan Deskripsi Talent"
-                    rows={4} // Adjust the number of rows as needed
-                    inputProps={{
-                      maxLength: 255,
-                    }}
-                    onChange={(e) => setDescTalent(e.target.value)}
-                    value={descTalent}
-                  />
-                </Grid>
-                <Grid item xs={6} sm={12}>
-                  {/* Upload CV */}
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Upload CV
-                  </Typography>
-                  <Box
-                    component="span"
-                    sx={{
-                      p: 2,
-                      border: '1px dashed blue',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      background: 'lightgrey',
-                      borderRadius: '5px',
-                      maxWidth: '100px',
-                      width: '100%',
-                      margin: 'left',
-                    }}
-                  >
-                    <label htmlFor="cv">
-                      <IconButton color="primary" aria-label="upload CV" component="span">
-                        <PictureAsPdfIcon sx={{ fontSize: 48 }} />
-                      </IconButton>
-                    </label>
-                    <Input type="file" id="cv" name="cv" onChange={handleCVFileChange} inputProps={{ accept: '.pdf', style: { display: 'none' } }} />
-                  </Box>
-                </Grid>
+              </Box>
 
-                <Grid item xs={6} sm={6}>
-                  {/* Total Pengalaman */}
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Total Pengalaman
-                  </Typography>
-                  <TextField
-                    id="total-pengalaman"
-                    fullWidth
-                    type="number"
-                    placeholder="Masukkan Total Pengalaman"
-                    inputProps={{
-                      min: 1,
-                      max: 10,
-                    }}
-                    onChange={(e) => setExperience(e.target.value)}
-                    value={experience}
-                  />
-                </Grid>
-                {/* Level */}
-                <Grid item xs={6} sm={6}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Level
-                  </Typography>
-                  <Select
-                    id="level"
-                    fullWidth
-                    native // Use the native select element
-                    onChange={(e) => setSelectedTalentLevel(e.target.value)}
-                    value={selectedTalentLevel}
-                  >
-                    {talentLevels.map((talentLevel) => (
-                      <option key={talentLevel.talentLevelId} value={talentLevel.talentLevelId}>
-                        {talentLevel.talentLevelName}
-                      </option>
-                    ))}
-                  </Select>
-                </Grid>
-                {/* Skill Set */}
-                <Grid item xs={12} sm={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Skill Set
-                  </Typography>
-                  <FormControl component="fieldset">
-                    <FormGroup row>
-                      {skillSetOptions.map((option) => (
-                        <FormControlLabel
-                          key={option.skillsetId}
-                          control={
-                            <Checkbox checked={selectedSkills.includes(option.skillsetId)} onChange={(e) => handleSkillChange(option.skillsetId)} />
-                          }
-                          label={option.skillsetName}
-                        />
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Deskripsi Talent</Typography>
+              <TextField
+                value={selectedForm.talentDescription}
+                onChange={handleDescChange}
+                multiline
+                rows={4}
+                placeholder="Write a description..."
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+              />
+
+              {/* Talent CV */}
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Upload CV</Typography>
+              <input type="file" accept=".pdf" onChange={handleFileCVChange} style={{ display: 'none' }} id="fileCVInput" />
+              <Paper
+                elevation={0}
+                sx={{
+                  borderRadius: '10px',
+                  border: '2px dashed #000',
+                  textAlign: 'center',
+                  width: '35%',
+                  borderColor: '#2C8AD3',
+                  background: '#EEF0F4',
+                  color: '#2C8AD3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  padding: '20px 0px',
+                  flexDirection: 'column',
+                }}
+                onClick={handlePaperCVClick}
+              >
+                {selectedForm.cv ? (
+                  <>
+                    <Typography>
+                      {selectedForm.cv.name}{' '}
+                      <IconButton onClick={handleDeleteCVClick}>
+                        <ClearIcon />
+                      </IconButton>
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <PictureAsPdfIcon sx={{ color: '#FF001F', fontSize: '250%' }} /> {/* Sesuaikan ukuran ikon */}
+                    </div>
+                    <Typography>Drag and drop file here or click to upload</Typography>
+                  </>
+                )}
+              </Paper>
+              {/* End Talent CV */}
+
+              <Box sx={{ flexGrow: 1, mb: '5px', mt: '20px' }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography sx={{ mb: '5px' }}>Pengalaman</Typography>
+                    <TextField
+                      type="number"
+                      value={selectedForm.experience}
+                      onChange={handleExperienceChange}
+                      sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                      InputProps={{
+                        endAdornment: <InputAdornment position="start">Tahun</InputAdornment>,
+                      }}
+                      variant="outlined"
+                      size="small"
+                      placeholder="Masukkan Tahun Pengalaman"
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography sx={{ mb: '5px' }}>Level</Typography>
+                    <Select
+                      displayEmpty
+                      placeholder="Pilih Level"
+                      value={selectedForm.levelId}
+                      onChange={(event) => setSelectedForm({ ...selectedForm, levelId: event.target.value })}
+                      sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                      size="small"
+                    >
+                      <MenuItem value="" disabled>
+                        Pilih Level
+                      </MenuItem>
+                      {levelOptions.map((levelOption) => (
+                        <MenuItem key={levelOption.talentLevelId} value={levelOption.talentLevelId}>
+                          {levelOption.talentLevelName}
+                        </MenuItem>
                       ))}
-                    </FormGroup>
-                  </FormControl>
+                    </Select>
+                  </Grid>
                 </Grid>
-                {/* Email */}
-                <Grid item xs={12} sm={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Email
-                  </Typography>
-                  <TextField
-                    id="email"
-                    fullWidth
-                    type="email"
-                    placeholder="Masukkan Email"
-                    inputProps={{
-                      maxLength: 100,
-                    }}
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                  />
-                </Grid>
-                {/* No Handphone */}
-                <Grid item xs={12} sm={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    No Handphone
-                  </Typography>
-                  <TextField
-                    id="no-handphone"
-                    fullWidth
-                    placeholder="Masukkan No Handphone"
-                    inputProps={{
-                      maxLength: 13,
-                    }}
-                    onChange={(e) => setNoHp(e.target.value)}
-                    value={noHp}
-                  />
-                </Grid>
-                {/* Status Kepegawaian */}
-                <Grid item xs={12} sm={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Status Kepegawaian
-                  </Typography>
-                  <Select
-                    id="status-kepegawaian"
-                    fullWidth
-                    native // Use the native select element
-                    onChange={(e) => setSelectedEmpStatus(e.target.value)}
-                    value={selectedEmpStatus}
-                  >
-                    {employeeStatuses.map((employeeStatus) => (
-                      <option key={employeeStatus.employeeStatusId} value={employeeStatus.employeeStatusId}>
-                        {employeeStatus.employeeStatusName}
-                      </option>
-                    ))}
-                  </Select>
-                </Grid>
-                {/* Biografi Video */}
-                <Grid item xs={12} sm={12}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: 'Roboto',
-                      fontWeight: '500',
-                      fontSize: '18px',
-                      marginBottom: '10px',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Biografi Video
-                  </Typography>
-                  <TextField
-                    id="biografi-video"
-                    fullWidth
-                    placeholder="Masukkan Biografi Video"
-                    inputProps={{
-                      maxLength: 255,
-                    }}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    value={videoUrl}
-                  />
-                </Grid>
+              </Box>
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Skill Set</Typography>
+              <Typography sx={{ mb: '5px', color: '#586A84' }} variant="caption">
+                Pilih lebih dari 1
+              </Typography>
+              <Grid container spacing={2}>
+                {skillSetOptions.map((skillOption) => (
+                  <Grid item key={skillOption.skillsetId}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={selectedForm.skillSet.includes(skillOption.skillsetId)}
+                          onChange={(event) => handleSkillChange(skillOption.skillsetId, event.target.checked)}
+                        />
+                      }
+                      label={skillOption.skillsetName}
+                    />
+                  </Grid>
+                ))}
               </Grid>
-            </Grid>
-          </Card>
-          <Grid style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" style={{ backgroundColor: '#C4C4C4', color: 'white' }} sx={{ marginTop: '15px' }}>
-              Batal
-            </Button>
-            <Button variant="contained" color="primary" sx={{ marginTop: '15px', marginLeft: '10px' }} onClick={handleSubmit}>
-              Simpan
-            </Button>
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>E-mail</Typography>
+              <TextField
+                type="email"
+                value={selectedForm.email}
+                onChange={(event) => setSelectedForm({ ...selectedForm, email: event.target.value })}
+                placeholder="Masukkan E-mail"
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
+              />
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>No. Hp / Whatsapp </Typography>
+              <TextField
+                type="number"
+                value={selectedForm.cellphone}
+                onChange={handleNoHpChange}
+                placeholder="Masukkan No. Hp / Whatsapp "
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
+              />
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Status Kepegawaian </Typography>
+
+              <Select
+                displayEmpty
+                placeholder="Pilih Status Kepegawaian"
+                value={selectedForm.employeeStatusId}
+                onChange={(event) => setSelectedForm({ ...selectedForm, employeeStatusId: event.target.value })}
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
+              >
+                <MenuItem value="" disabled>
+                  Pilih Status Kepegawaian
+                </MenuItem>
+                {employeeStatusOptions.map((statusOption) => (
+                  <MenuItem key={statusOption.employeeStatusId} value={statusOption.employeeStatusId}>
+                    {statusOption.employeeStatusName}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <Typography sx={{ mb: '5px', mt: '20px' }}>Biografi Video (Opsional) </Typography>
+              <TextField
+                value={selectedForm.videoUrl}
+                onChange={(event) => setSelectedForm({ ...selectedForm, videoUrl: event.target.value })}
+                placeholder="Masukkan URL Biografi Video "
+                sx={{ background: '#F2F6FA', width: '100%', borderRadius: '6px', borderWidth: '0px' }}
+                size="small"
+              />
+
+              <Box sx={{ mb: '20px', mt: '20px', display: 'flex', justifyContent: 'end' }}>
+                <Button variant="contained" sx={{ mr: 2, background: '#C4C4C4', color: '#FFFFFF', '&:hover': { backgroundColor: '#C4C4C4' } }}>
+                  Batal
+                </Button>
+                <Button variant="contained" onClick={handleSubmit}>
+                  Simpan
+                </Button>
+              </Box>
+            </Box>
           </Grid>
-        </form>
-      </Grid>
-    </Grid>
+        </Card>
+      </Box>
+    </AdminLayout>
   );
 }
-
-export default TambahTalent;
