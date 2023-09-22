@@ -8,7 +8,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InboxIcon from '@mui/icons-material/Inbox';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchSearchTags } from 'apis';
 
 function Navbar() {
@@ -20,7 +20,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   const navigateToWishlist = () => {
-    navigate('/wishlist');
+    navigate('/client/main/wishlist');
   };
 
   useEffect(() => {
@@ -56,7 +56,7 @@ function Navbar() {
     <AppBar position="static" sx={{ backgroundColor: '#081E43', width: '100%' }}>
       <Container maxWidth="">
         <Toolbar disableGutters sx={{ height: { md: '100px', xs: '66px' } }}>
-          <a href="#">
+          <Link to="/client/main">
             <Avatar
               src={process.env.PUBLIC_URL + '/resource/image/logotujuhsembilan-without-text.svg'}
               alt="Talent Center 79 Logo"
@@ -70,12 +70,12 @@ function Navbar() {
                 },
               }}
             />
-          </a>
+          </Link>
           <Typography
             variant="h6"
             noWrap
             component="a"
-            href="/"
+            href="/client/main"
             sx={{
               mr: 2,
               fontFamily: 'Inter',

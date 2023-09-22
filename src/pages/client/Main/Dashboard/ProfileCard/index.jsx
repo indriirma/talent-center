@@ -34,7 +34,7 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
   const userId = cookieData.userId;
 
   const navigateToDetail = (talentId) => {
-    navigate('/client/main/detail/' + talentId);
+    navigate('detail/' + talentId);
   };
 
   const handleAddToList = async (talentId) => {
@@ -52,9 +52,6 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
       console.log(success);
     } catch (error) {
       console.error(error);
-      // setAlertOpen(true);
-      // setAlertMessage('An error occurred during add to wishlist operation.');
-      // setAlertSeverity('error');
     }
   };
 

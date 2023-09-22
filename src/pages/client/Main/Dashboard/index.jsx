@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
 import SideBar from './Sidebar';
 import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typography, Button, Drawer, LinearProgress } from '@mui/material';
 import SortYear from './SortYear';
@@ -9,6 +8,7 @@ import { fetchTalentList } from 'apis';
 import Cookies from 'js-cookie';
 import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Navbar from '../Component/Navbar';
 
 const EntriesToggleButtonGroup = ({ value, onChange }) => {
   const entries = [10, 20, 50];

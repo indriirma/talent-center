@@ -1,5 +1,5 @@
 import { CheckCircleOutlineRounded, ReportProblemOutlined, DeleteForeverOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, Typography, Box, Button } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Typography, Box, Button, DialogActions } from '@mui/material';
 
 export const SuccessAlert = ({ title, description, open, close }) => {
   return (
@@ -78,9 +78,9 @@ export const WarningAlert = ({ title, description, open, close, handleClick }) =
   );
 };
 
-export const DeleteAlert = ({open, close, title, description, deleteClick})=>{
-  return(
-      <div style={{ textAlign: 'center' }}>
+export const DeleteAlert = ({ open, close, title, description, deleteClick }) => {
+  return (
+    <div style={{ textAlign: 'center' }}>
       <Dialog open={open} onClose={close} fullWidth maxWidth="xs">
         <DialogTitle>
           <Box display="flex" justifyContent="left" alignItems="center" mb={2}>
@@ -137,7 +137,7 @@ export const DeleteAlert = ({open, close, title, description, deleteClick})=>{
           <Button
             onClick={() => {
               deleteClick();
-              close(); 
+              close();
             }}
             color="primary"
             style={{
@@ -161,5 +161,5 @@ export const DeleteAlert = ({open, close, title, description, deleteClick})=>{
         </DialogActions>
       </Dialog>
     </div>
-  )
-}
+  );
+};

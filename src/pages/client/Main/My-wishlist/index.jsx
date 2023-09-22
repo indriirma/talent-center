@@ -1,20 +1,35 @@
 import { Box, Container, Typography, Grid, Avatar, Chip, Divider, Button } from '@mui/material';
 import Navbar from '../Component/Navbar';
 import { DeleteOutlineOutlined, KeyboardArrowRight, SimCardDownloadOutlined } from '@mui/icons-material';
-import { SuccessAlert } from 'pages/component/PopupAlert';
+import { DeleteAlert, SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { fetchWishlist } from 'apis';
+import { fetchWishlist, removeWishlist, removeAllWishlist } from 'apis';
 import { handleDownloadCVUrl } from 'pages/component/eventHandler';
+import { useNavigate } from 'react-router-dom';
 
 const Wishlist = () => {
-  const successTitle = 'Your Request is in Process!';
-  const successDescription = 'You can check your request status at "My Request" menu';
-  const [isRequestSuccess, setIsRequestSuccess] = useState(false);
+  const title = 'Your Request is in Process!';
+  const description = 'You can check your request status at "My Request" menu';
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [talentData, setTalentData] = useState([]);
   const handleCloseSuccess = () => {
-    setIsRequestSuccess(false);
+    setIsSuccessOpen(false);
   };
+  const [successTitle, setSuccessTitle] = useState('');
+  const [successDesc, setSuccessDesc] = useState('');
+
+  const [isDeleteAlert, setIsDeleteAlert] = useState(false);
+  const [deleteTitle, setDeleteTitle] = useState('');
+  const [deleteDesc, setDeleteDesc] = useState('');
+  const [handleDelete, setHandleDelete] = useState(false);
+
+  const [isWarnOpen, setIsWarnOpen] = useState(false);
+  const [warnTitle, setWarnTitle] = useState('');
+  const [warnDesc, setWarnDesc] = useState('');
+  const [handleWarn, setHandleWarn] = useState(null);
+
+  const [selectedWishId, setSelectedWishId] = useState('');
 
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
@@ -32,13 +47,91 @@ const Wishlist = () => {
     }
   };
 
+  const navigate = useNavigate();
+
+  const navigateToDetail = (talentId) => {
+    navigate('/client/main/detail/' + talentId);
+  };
+
   useEffect(() => {
     getDataWishlist();
   }, []);
 
+  const handleRemoveWishlist = () => {
+    removeWishlist(userId, selectedWishId)
+      .then((response) => {
+        if (response.status == '200') {
+          getDataWishlist();
+          const title = 'Wishlist removed successfully';
+          const descrip = 'You can add other talent in your wishlist at "My Wishlist" menu.';
+          handleSuccessAlert(title, descrip);
+        } else {
+          handleWarnAlert(response.status, response.message, null);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleRemoveAllWishlist = () => {
+    removeAllWishlist(userId)
+      .then((response) => {
+        if (response.status == '200') {
+          getDataWishlist();
+          const title = 'All wishlist removed successfully';
+          const descrip = 'You can add other talent in your wishlist at "My Wishlist" menu.';
+          handleSuccessAlert(title, descrip);
+        } else {
+          handleWarnAlert(response.status, response.message, null);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleDeleteAlert = (title, desc, handle) => {
+    setDeleteTitle(title);
+    setDeleteDesc(desc);
+    setHandleDelete(handle);
+    setIsDeleteAlert(true);
+  };
+
+  const handleSuccessAlert = (title, descrip) => {
+    setSuccessTitle(title);
+    setSuccessDesc(descrip);
+    setIsSuccessOpen(true);
+  };
+
+  const handleWarnAlert = (title, descrip, handle) => {
+    setWarnTitle(title);
+    setWarnDesc(descrip);
+    setHandleWarn(handle);
+    setIsWarnOpen(true);
+  };
+
   return (
     <>
-      <SuccessAlert title={successTitle} description={successDescription} open={isRequestSuccess} close={handleCloseSuccess} />
+      <DeleteAlert
+        open={isDeleteAlert}
+        close={() => {
+          setIsDeleteAlert(false);
+        }}
+        title={deleteTitle}
+        description={deleteDesc}
+        deleteClick={handleDelete ? handleRemoveWishlist : handleRemoveAllWishlist}
+      />
+      <WarningAlert
+        title={warnTitle}
+        description={warnDesc}
+        open={isWarnOpen}
+        close={() => {
+          setIsWarnOpen(false);
+        }}
+        handleClick={handleWarn}
+      />
+      <SuccessAlert title={successTitle} description={successDesc} open={isSuccessOpen} close={handleCloseSuccess} />
       <Navbar />
       {talentData.length !== 0 ? (
         <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
@@ -181,7 +274,9 @@ const Wishlist = () => {
                         <Divider orientation="vertical" />
                         <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           <Button
-                            // onClick={}
+                            onClick={() => {
+                              navigateToDetail(dataTalent?.talentId);
+                            }}
                             startIcon={<KeyboardArrowRight />}
                             sx={{ textTransform: 'none' }}
                           >
@@ -197,7 +292,12 @@ const Wishlist = () => {
                             Download CV
                           </Button>
                           <Button
-                            // onClick={}
+                            onClick={() => {
+                              setSelectedWishId(dataTalent?.wishlistId);
+                              const title = 'Remove Talent ' + dataTalent?.talentName + ' from your Wishlist';
+                              const descrip = 'Are you sure you want to remove your wishlist?';
+                              handleDeleteAlert(title, descrip, true);
+                            }}
                             startIcon={<DeleteOutlineOutlined />}
                             sx={{ color: 'red', textTransform: 'none' }}
                           >
@@ -237,7 +337,11 @@ const Wishlist = () => {
               >
                 <Grid item>
                   <Button
-                    // onClick={}
+                    onClick={() => {
+                      const title = 'Remove All your Wishlist';
+                      const descrip = 'Are you sure you want to remove all of your wishlist?';
+                      handleDeleteAlert(title, descrip, false);
+                    }}
                     startIcon={<DeleteOutlineOutlined />}
                     sx={{ color: 'red', textTranform: 'none' }}
                   >
@@ -270,7 +374,7 @@ const Wishlist = () => {
               md: { xs: '150px', md: '310px' },
             }}
           >
-            <img style={{ width: '100%', height: 'auto' }} />
+            <img src="" style={{ width: '100%', height: 'auto' }} />
           </Box>
           <Typography>Your wishlist is currently empty, but don't worry! We're here to help you discover your dream team.</Typography>
         </Box>
