@@ -133,6 +133,7 @@ const Detail = () => {
 
   const handleGalOpen = (index) => {
     setGalIndex(index);
+    console.log('index gal : ', index);
     setIsGalOpen(true);
   };
 
@@ -259,7 +260,7 @@ const Detail = () => {
                   <ColumnInfo title={'Skill Set'} content={<SkillSetTag />} />
                 </SkillsetComp>
                 <ColumnInfo title={'Project Completed'} content={<LabelInfo title={'Projects'} data={dataTalent.projectCompleted} />} />
-                <ColumnInfo title={'Total Request'} content={<LabelInfo title="Requested" data={dataTalent.totalRequested} />} />
+                <ColumnInfo title={'Total Request'} content={<LabelInfo title={'Requested'} data={dataTalent.totalRequested} />} />
               </Grid>
             </Grid>
           </Grid>

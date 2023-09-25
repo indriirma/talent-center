@@ -18,7 +18,12 @@ export const Carousel = ({ medias, handleClick }) => {
     setActiveIndex((prevIndex) => (prevIndex === 0 ? medias.length - 1 : prevIndex - 1));
   };
   const handleNext = () => {
-    setActiveIndex((nextIndex) => (nextIndex === 0 ? medias.length - 1 : nextIndex - 1));
+    setActiveIndex((nextIndex) => (nextIndex === medias.length - 1 ? 0 : nextIndex + 1));
+  };
+
+  const handleClickCarousel = (index) => {
+    handleClick(index);
+    setActiveIndex(index);
   };
 
   return (
@@ -31,7 +36,7 @@ export const Carousel = ({ medias, handleClick }) => {
       height={200}
       width={300}
       heightMedia="600px"
-      click={handleClick}
+      click={handleClickCarousel}
     />
   );
 };

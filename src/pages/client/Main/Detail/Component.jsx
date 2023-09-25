@@ -1,5 +1,6 @@
 import { Typography, Grid, Box, IconButton } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { useEffect } from 'react';
 
 export const TagInfo = ({ tag }) => {
   return (
@@ -15,7 +16,7 @@ export const LabelInfo = (props) => {
   const { title, data } = props;
   return (
     <Typography variant="body2" fontFamily="Inter">
-      {data + ' ' + title}
+      {data ? data : '0' + ' ' + title}
     </Typography>
   );
 };
@@ -43,6 +44,10 @@ export const ColumnInfo = ({ title, content }) => {
 };
 
 export const CarouselComp = ({ medias, prev, next, activeIndex, otherComp, height, width, click = null, heightMedia }) => {
+  useEffect(() => {
+    console.log('use effect c ', activeIndex);
+  }, [activeIndex]);
+
   return (
     <Box
       position="relative"

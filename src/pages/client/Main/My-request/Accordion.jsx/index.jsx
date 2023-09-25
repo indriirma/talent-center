@@ -1,5 +1,5 @@
 import { ExpandMore } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Container, Grid, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Container, Grid, Typography, Avatar, Chip } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,10 +45,19 @@ const AccordionComp = ({ data }) => {
           <AccordionDetails>
             <Container>
               {item.talentData.map((talent, talentIndex) => (
-                <React.Fragment>
-                  <Grid container>
+                <React.Fragment key={talentIndex}>
+                  <Grid container sx={{}}>
                     <Grid container>
-                      <Grid item></Grid>
+                      <Grid item>
+                        <Avatar />
+                      </Grid>
+                      <Grid item>
+                        <Grid container>
+                          <Grid item>
+                            <Chip label={<Typography></Typography>} />
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </React.Fragment>

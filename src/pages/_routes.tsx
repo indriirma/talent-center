@@ -18,6 +18,7 @@ import LandingPage from './client/landing-page';
 import Main from './client/Main/Dashboard';
 import Detail from './client/Main/Detail';
 import Wishlist from './client/Main/My-wishlist';
+import MyRequest from './client/Main/My-request';
 
 const routes: SecurableRoute[] = [
   {
@@ -58,7 +59,7 @@ const routes: SecurableRoute[] = [
           },
           {
             path: 'request',
-            element:<Main/>
+            element:<MyRequest/>
           },
           {
             path: 'detail/:id',
@@ -108,7 +109,7 @@ const routes: SecurableRoute[] = [
         path: 'tambah-talent',
         element: <DashboardLayout />,
         children: [
-          {            
+          {
             index: true,
             element: <TambahTalent />,
           },

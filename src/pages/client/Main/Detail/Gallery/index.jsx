@@ -1,7 +1,7 @@
 import { IconButton, Dialog } from '@mui/material';
 import { CarouselComp } from '../Component';
 import { HighlightOff } from '@mui/icons-material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const CloseIcon = ({ close }) => {
   return (
@@ -21,15 +21,19 @@ const CloseIcon = ({ close }) => {
 };
 
 export const Gallery = ({ medias, open, initialIndex, close }) => {
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const [galActiveIndex, setGalActiveIndex] = useState(initialIndex);
   const handlePrevious = () => {
-    setActiveIndex((prevIndex) => (prevIndex === 0 ? medias.length - 1 : prevIndex - 1));
+    setGalActiveIndex((prevIndex) => (prevIndex === 0 ? medias.length - 1 : prevIndex - 1));
   };
   const handleNext = () => {
-    setActiveIndex((nextIndex) => (nextIndex === 0 ? medias.length - 1 : nextIndex - 1));
+    setGalActiveIndex((nextIndex) => (nextIndex === medias.length - 1 ? 0 : nextIndex + 1));
   };
+  useEffect(() => {
+    setGalActiveIndex(initialIndex);
+  }, [open]);
+
   const handleClick = (index) => {
-    setActiveIndex(index);
+    setGalActiveIndex(index);
   };
   const galleryStyle = {
     maxWidth: 'md',
@@ -46,12 +50,13 @@ export const Gallery = ({ medias, open, initialIndex, close }) => {
     >
       <CarouselComp
         medias={medias}
-        activeIndex={activeIndex}
+        activeIndex={galActiveIndex}
         prev={handlePrevious}
         next={handleNext}
         height={500}
         width={500}
         heightMedia="200px"
+        click={handleClick}
         otherComp={<CloseIcon close={close} />}
       />
       {/* <Box

@@ -7,10 +7,9 @@ import Cookies from 'js-cookie';
 import { fetchWishlist, removeWishlist, removeAllWishlist } from 'apis';
 import { handleDownloadCVUrl } from 'pages/component/eventHandler';
 import { useNavigate } from 'react-router-dom';
+import { requestAllWishlist } from 'apis';
 
 const Wishlist = () => {
-  const title = 'Your Request is in Process!';
-  const description = 'You can check your request status at "My Request" menu';
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [talentData, setTalentData] = useState([]);
   const handleCloseSuccess = () => {
@@ -77,7 +76,7 @@ const Wishlist = () => {
   const handleRemoveAllWishlist = () => {
     removeAllWishlist(userId)
       .then((response) => {
-        if (response.status == '200') {
+        if (response.status === 200) {
           getDataWishlist();
           const title = 'All wishlist removed successfully';
           const descrip = 'You can add other talent in your wishlist at "My Wishlist" menu.';
@@ -88,6 +87,24 @@ const Wishlist = () => {
       })
       .catch((error) => {
         console.log(error);
+      });
+  };
+
+  const handleRequest = () => {
+    const wishlist = talentData.map((item) => ({ wishlistId: item.wishlistId }));
+    requestAllWishlist(userId, wishlist)
+      .then((response) => {
+        if (response.status === 200) {
+          getDataWishlist();
+          const title = 'Your Request is in Process!';
+          const description = 'You can check your request status at "My Request" menu';
+          handleSuccessAlert(title, description);
+        } else {
+          handleWarnAlert(response.status, response.message, null);
+        }
+      })
+      .catch((error) => {
+        console.error('error fetching API : ' + error);
       });
   };
 
@@ -142,11 +159,11 @@ const Wishlist = () => {
               </Typography>
             </Container>
             <Container sx={{ my: '1rem' }}>
-              <Grid container sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Grid container>
                 <Grid
                   container
                   sx={{
-                    padding: '2rem 5rem 2rem 5rem',
+                    padding: '2rem 3rem 2rem 3rem',
                     width: '100%',
                     display: 'flex',
                     justifyContent: { xs: 'space-between', sm: 'flex-end' },
@@ -202,6 +219,7 @@ const Wishlist = () => {
                               mb: '0.75rem',
                               gap: '0.5rem',
                               alignItems: 'center',
+                              display: { xs: 'none', sm: 'flex' },
                             }}
                           >
                             <Grid item>
@@ -218,10 +236,10 @@ const Wishlist = () => {
                               </Typography>
                             </Grid>
                           </Grid>
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="bold" variant="body2" sx={{ display: { xs: 'none', sm: 'flex' } }}>
                             Position
                           </Typography>
-                          <Grid container>
+                          <Grid container sx={{ display: { xs: 'none', sm: 'flex' } }}>
                             {dataTalent.position.map((item, index) => (
                               <Box
                                 sx={{
@@ -239,10 +257,10 @@ const Wishlist = () => {
                               </Box>
                             ))}
                           </Grid>
-                          <Typography variant="body2" sx={{ mt: '1rem' }} fontWeight="bold">
+                          <Typography variant="body2" sx={{ mt: '1rem', display: { xs: 'none', sm: 'flex' } }} fontWeight="bold">
                             Skill Set
                           </Typography>
-                          <Grid container>
+                          <Grid container sx={{ display: { xs: 'none', sm: 'flex' } }}>
                             {dataTalent.skillSet.map((item, index) => (
                               <Box
                                 sx={{
@@ -266,13 +284,13 @@ const Wishlist = () => {
                       <Grid
                         item
                         sx={{
-                          display: { xs: 'none', sm: 'flex' },
+                          display: 'flex',
                           flexDirection: 'row',
                           alignItems: 'center',
                         }}
                       >
-                        <Divider orientation="vertical" />
-                        <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Divider orientation="vertical" sx={{ display: { xs: 'none', sm: 'block' } }} />
+                        <Container sx={{ display: 'flex', flexDirection: { xs: 'row', sm: 'column' }, alignItems: 'flex-start' }}>
                           <Button
                             onClick={() => {
                               navigateToDetail(dataTalent?.talentId);
@@ -280,7 +298,7 @@ const Wishlist = () => {
                             startIcon={<KeyboardArrowRight />}
                             sx={{ textTransform: 'none' }}
                           >
-                            See Detail
+                            <Typography sx={{ fontFamily: 'Inter', fontWeight: '400', fontSize: { xs: '8pt', sm: '12pt' } }}>See Detail</Typography>
                           </Button>
                           <Button
                             onClick={() => {
@@ -289,7 +307,7 @@ const Wishlist = () => {
                             startIcon={<SimCardDownloadOutlined />}
                             sx={{ color: '#848484', textTransform: 'none' }}
                           >
-                            Download CV
+                            <Typography sx={{ fontFamily: 'Inter', fontWeight: '400', fontSize: { xs: '8pt', sm: '12pt' } }}>Download CV</Typography>
                           </Button>
                           <Button
                             onClick={() => {
@@ -301,7 +319,7 @@ const Wishlist = () => {
                             startIcon={<DeleteOutlineOutlined />}
                             sx={{ color: 'red', textTransform: 'none' }}
                           >
-                            Remove
+                            <Typography sx={{ fontFamily: 'Inter', fontWeight: '400', fontSize: { xs: '8pt', sm: '12pt' } }}>Remove</Typography>
                           </Button>
                         </Container>
                       </Grid>
@@ -350,7 +368,7 @@ const Wishlist = () => {
                 </Grid>
                 <Grid item>
                   <Button
-                    // onClick={}
+                    onClick={handleRequest}
                     sx={{
                       backgroundColor: '#2C8AD3',
                       color: 'white',
