@@ -3,6 +3,7 @@ import { Box, Typography, Accordion, AccordionSummary, AccordionDetails, Avatar,
 import { ExpandMore as ExpandMoreIcon, KeyboardArrowRight as KeyboardArrowRightIcon, SimCardDownloadOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { downloadCV } from 'apis';
+import { AccordionComp } from './Accordion.jsx';
 
 const AccordionComponent = ({ accordionData }) => {
   const navigate = useNavigate();
@@ -204,7 +205,11 @@ const AccordionComponent = ({ accordionData }) => {
 };
 
 const MyRequest = () => {
-  return <></>;
+  return (
+    <>
+      <AccordionComp data={null} />
+    </>
+  );
 };
 
 export default MyRequest;
