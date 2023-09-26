@@ -26,7 +26,7 @@ const Wishlist = () => {
   const [isWarnOpen, setIsWarnOpen] = useState(false);
   const [warnTitle, setWarnTitle] = useState('');
   const [warnDesc, setWarnDesc] = useState('');
-  const [handleWarn, setHandleWarn] = useState(null);
+  const [handleWarn, setHandleWarn] = useState();
 
   const [selectedWishId, setSelectedWishId] = useState('');
 
@@ -42,6 +42,7 @@ const Wishlist = () => {
         })
         .catch((error) => {
           console.error(error);
+          handleWarnAlert(error.response.status, error.response.message, 'error');
         });
     }
   };
@@ -52,6 +53,15 @@ const Wishlist = () => {
     navigate('/client/main/detail/' + talentId);
   };
 
+  const navigateToSignIn = () => {
+    navigate('/client');
+  };
+
+  const handleWarnArr = {
+    login: navigateToSignIn,
+    error: null,
+  };
+
   useEffect(() => {
     getDataWishlist();
   }, []);
@@ -59,17 +69,18 @@ const Wishlist = () => {
   const handleRemoveWishlist = () => {
     removeWishlist(userId, selectedWishId)
       .then((response) => {
-        if (response.status == '200') {
+        if (response.status === 200) {
           getDataWishlist();
           const title = 'Wishlist removed successfully';
           const descrip = 'You can add other talent in your wishlist at "My Wishlist" menu.';
           handleSuccessAlert(title, descrip);
         } else {
-          handleWarnAlert(response.status, response.message, null);
+          handleWarnAlert(response.status, response.message, 'error');
         }
       })
       .catch((error) => {
         console.log(error);
+        handleWarnAlert(error.response.status, error.response.message, 'error');
       });
   };
 
@@ -81,12 +92,11 @@ const Wishlist = () => {
           const title = 'All wishlist removed successfully';
           const descrip = 'You can add other talent in your wishlist at "My Wishlist" menu.';
           handleSuccessAlert(title, descrip);
-        } else {
-          handleWarnAlert(response.status, response.message, null);
         }
       })
       .catch((error) => {
         console.log(error);
+        handleWarnAlert(error.response.status, error.response.message, 'error');
       });
   };
 
@@ -100,11 +110,12 @@ const Wishlist = () => {
           const description = 'You can check your request status at "My Request" menu';
           handleSuccessAlert(title, description);
         } else {
-          handleWarnAlert(response.status, response.message, null);
+          handleWarnAlert(response.status, response.message, 'error');
         }
       })
       .catch((error) => {
         console.error('error fetching API : ' + error);
+        handleWarnAlert(error.response.status, error.response.message, 'error');
       });
   };
 
@@ -128,6 +139,12 @@ const Wishlist = () => {
     setIsWarnOpen(true);
   };
 
+  const warnLogin = () => {
+    const title = 'Access Forbidden!';
+    const descrip = 'You should login first!';
+    handleWarnAlert(title, descrip, 'login');
+  };
+
   return (
     <>
       <DeleteAlert
@@ -146,7 +163,7 @@ const Wishlist = () => {
         close={() => {
           setIsWarnOpen(false);
         }}
-        handleClick={handleWarn}
+        handleClick={handleWarnArr[handleWarn]}
       />
       <SuccessAlert title={successTitle} description={successDesc} open={isSuccessOpen} close={handleCloseSuccess} />
       <Navbar />
@@ -302,7 +319,12 @@ const Wishlist = () => {
                           </Button>
                           <Button
                             onClick={() => {
-                              handleDownloadCVUrl({ cvUrl: dataTalent?.talentCvUrl });
+                              handleDownloadCVUrl({
+                                cvUrl: dataTalent?.talentCvUrl,
+                                warn: warnLogin,
+                                talentName: dataTalent?.talentName,
+                                success: handleSuccessAlert,
+                              });
                             }}
                             startIcon={<SimCardDownloadOutlined />}
                             sx={{ color: '#848484', textTransform: 'none' }}

@@ -41,15 +41,26 @@ const Detail = () => {
     setWarningDesc(desc);
   };
 
+  const navigateToSignIn = () => {
+    navigate('/client');
+  };
+
+  const navigateToMain = () => {
+    navigate('/client/main');
+  };
+
+  const handleWarnArr = {
+    login: navigateToSignIn,
+    main: navigateToMain,
+    error: null,
+  };
+
   const handleLoginFirst = () => {
     handleWarningText(warnTitle, warnDescription);
-    setPage('/client');
+    setPage('login');
     setIsWarnOpen(true);
   };
 
-  const navigatePage = (page) => {
-    navigate(page);
-  };
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
   const userId = cookieData.userId;
@@ -61,20 +72,37 @@ const Detail = () => {
   const updateWishlist = async (userId) => {
     fetchWishlist(userId)
       .then((response) => {
-        const talentIdArr = response.data.map((item) => item.talentId);
-        setIsWishlist(talentIdArr.includes(parseInt(id)));
+        if (response.status === 200) {
+          const talentIdArr = response.data.map((item) => item.talentId);
+          setIsWishlist(talentIdArr.includes(parseInt(id)));
+        }
       })
       .catch((error) => {
-        console.error(error);
+        handleWarningText(error.response.status, error.response.massage);
+        setPage('error');
+        setIsWarnOpen(true);
       });
   };
 
   const fetchData = async () => {
     try {
-      const temp = await fetchDataTalent(id);
-      setDataTalent(temp);
+      await fetchDataTalent(id).then((response) => {
+        if (response.status === 200) {
+          setDataTalent(response.data);
+        }
+      });
     } catch (error) {
-      console.error('Error fetching data : ', error);
+      if (error.response.status === 400) {
+        const title = 'Talent Not Found!';
+        const descrip = 'You should choose one of Talents';
+        handleWarningText(title, descrip);
+        setPage('main');
+        setIsWarnOpen(true);
+      } else {
+        handleWarningText(error.response.status, error.response.massage);
+        setPage('error');
+        setIsWarnOpen(true);
+      }
     }
   };
 
@@ -109,14 +137,6 @@ const Detail = () => {
     try {
       if (userId === undefined) {
         handleLoginFirst();
-        return;
-      }
-      if (!dataTalent.talentId) {
-        const title = 'Talent Not Found!';
-        const descrip = 'You should choose one of Talents';
-        handleWarningText(title, descrip);
-        setPage('/client/main');
-        setIsWarnOpen(true);
         return;
       }
       const success = await addToWishlist(dataTalent.talentId, userId);
@@ -156,9 +176,7 @@ const Detail = () => {
         close={() => {
           setIsWarnOpen(false);
         }}
-        handleClick={() => {
-          navigatePage(page);
-        }}
+        handleClick={handleWarnArr[page]}
       />
       <SuccessAlert
         title={successTitle}

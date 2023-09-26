@@ -1,22 +1,23 @@
-import { ExpandMore } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Container, Grid, Typography, Avatar, Chip } from '@mui/material';
+import { ExpandMore, KeyboardArrowRight, SimCardDownloadOutlined } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Container, Grid, Typography, Avatar, Chip, Box, Divider, Button } from '@mui/material';
+import { handleDownloadCVUrl } from 'pages/component/eventHandler';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const AccordionComp = ({ data }) => {
+export const AccordionComp = ({ data, warn, success, sucOpen }) => {
   const navigate = useNavigate();
   const status = [
     {
-      colorMap: '#30A952',
-      textMap: 'Approved',
+      0: '#30A952',
+      1: 'Approved',
     },
     {
-      colorMap: '#CF1D1D',
-      textMap: 'Rejected',
+      0: '#CF1D1D',
+      1: 'Rejected',
     },
     {
-      colorMap: '#F2C103',
-      textMap: 'On Progress',
+      0: '#F2C103',
+      1: 'On Progress',
     },
   ];
   return (
@@ -90,12 +91,12 @@ export const AccordionComp = ({ data }) => {
                                     fontWeight: '700',
                                   }}
                                 >
-                                  {status[talent.talentRequestStatusId][1]}
+                                  {status[talent.talentRequestStatusId - 1][1]}
                                 </Typography>
                               }
                               size="small"
                               sx={{
-                                backgroundColor: status[talent.talentRequestStatusId][0] || '#848484',
+                                backgroundColor: status[talent.talentRequestStatusId - 1][0] || '#848484',
                                 padding: 2,
                               }}
                             />
@@ -120,11 +121,13 @@ export const AccordionComp = ({ data }) => {
                             mb: '0.75rem',
                             gap: '0.5rem',
                             alignItems: 'center',
+                            display: { xs: 'none', sm: 'flex' },
                           }}
                         >
                           <Grid item>
                             <Typography
                               variant="body2"
+                              fontFamily="Poppins"
                               sx={{
                                 color: '#848484',
                               }}
@@ -143,13 +146,15 @@ export const AccordionComp = ({ data }) => {
                             />
                           </Grid>
                           <Grid item>
-                            <Typography variant="body2" sx={{ color: '#848484' }}>
+                            <Typography variant="body2" fontFamily="Poppins" sx={{ color: '#848484' }}>
                               {talent.talentLevel} Level
                             </Typography>
                           </Grid>
                         </Grid>
-                        <Typography fontWeight="bold">Position</Typography>
-                        <Grid container>
+                        <Typography fontFamily="Poppins" fontWeight="bold" sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                          Position
+                        </Typography>
+                        <Grid container sx={{ display: { xs: 'none', sm: 'flex' } }}>
                           {talent.position.map((posItem, posIndex) => (
                             <Box
                               key={posIndex}
@@ -161,16 +166,85 @@ export const AccordionComp = ({ data }) => {
                               }}
                               width="fit-content"
                             >
-                              <Typography sx={{ p: '2px 5px' }}>{posItem.positionName}</Typography>
+                              <Typography fontFamily="Poppins" sx={{ p: '2px 5px' }}>
+                                {posItem.positionName}
+                              </Typography>
                             </Box>
                           ))}
                         </Grid>
-                        <Typography sx={{ mt: '1rem' }} fontWeight="bold">
+                        <Typography fontFamily="Poppins" sx={{ mt: '1rem', display: { xs: 'none', sm: 'flex' } }} fontWeight="bold">
                           Skill Set
                         </Typography>
+                        <Grid container sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                          {talent.skillSet.map((skiItem, skiIndex) => (
+                            <Box
+                              key={skiIndex}
+                              sx={{
+                                mr: '0.5rem',
+                                backgroundColor: '#E4EEF6',
+                                borderRadius: '3px',
+                                mb: 1.5,
+                              }}
+                              width="fit-content"
+                            >
+                              <Typography fontFamily="Poppins" sx={{ p: '2px 5px' }}>
+                                {skiItem.skillsetName}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Grid>
                       </Grid>
                     </Grid>
+
+                    <Grid
+                      item
+                      sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Divider orientation="vertical" />
+                      <Container
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <Button
+                          onClick={() => {
+                            navigate('/client/main/detail/' + talent.talentId);
+                          }}
+                          startIcon={<KeyboardArrowRight />}
+                          sx={{
+                            textTransform: 'none',
+                          }}
+                        >
+                          <Typography sx={{ fontFamily: 'Poppins', fontWeight: '400', fontSize: { xs: '8pt', sm: '12pt' } }}>See Detail</Typography>
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            handleDownloadCVUrl({
+                              cvUrl: talent.talentCvUrl,
+                              talentName: talent.talentName,
+                              warn: warn,
+                              success: success,
+                              sucOpen: sucOpen,
+                            })
+                          }
+                          startIcon={<SimCardDownloadOutlined />}
+                          sx={{
+                            color: '#848484',
+                            textTransform: 'none',
+                          }}
+                        >
+                          <Typography sx={{ fontFamily: 'Poppins', fontWeight: '400', fontSize: { xs: '8pt', sm: '12pt' } }}>Download CV</Typography>
+                        </Button>
+                      </Container>
+                    </Grid>
                   </Grid>
+                  {talentIndex !== item.talentData.length - 1 && <Divider sx={{ my: '1rem' }} />}
                 </React.Fragment>
               ))}
             </Container>

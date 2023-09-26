@@ -1,213 +1,237 @@
-import React from 'react';
-import { Box, Typography, Accordion, AccordionSummary, AccordionDetails, Avatar, Chip, Button, Divider, Grid, Container } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon, KeyboardArrowRight as KeyboardArrowRightIcon, SimCardDownloadOutlined } from '@mui/icons-material';
+import { Box, Container, Tab, Typography } from '@mui/material';
+import Navbar from '../Component/Navbar.jsx';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { AccordionComp } from './Accordion/index.jsx';
+import { InfoOutlined } from '@mui/icons-material';
+import Cookies from 'js-cookie';
+import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert.jsx';
 import { useNavigate } from 'react-router-dom';
-import { downloadCV } from 'apis';
-import { AccordionComp } from './Accordion.jsx';
+import { fetchRequest } from 'apis/index.js';
 
-const AccordionComponent = ({ accordionData }) => {
+const MyRequest = () => {
+  const [tabValue, setTabValue] = useState('1');
+  const [allRequest, setAllRequest] = useState([]);
+  const [approvedReq, setApprovedReq] = useState([]);
+  const [rejectedReq, setRejectedReq] = useState([]);
+  const [onProgReq, setOnProgReq] = useState([]);
+  const [isWarnOpen, setIsWarnOpen] = useState(false);
+  const [warnTitle, setWarnTitle] = useState('');
+  const [warnDesc, setWarnDesc] = useState('');
+  const [handleWarn, setHandleWarn] = useState();
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successTitle, setSuccessTitle] = useState('');
+  const [successDesc, setSuccessDesc] = useState('');
+
+  const dataArray = Cookies.get('loginRequirement');
+  const cookieData = JSON.parse(dataArray || '[]');
+  const userId = cookieData.userId;
+
+  const tabAtribute = [
+    {
+      label: 'All',
+      value: '1',
+    },
+    {
+      label: '(' + onProgReq.length + ') In Progress',
+      value: '2',
+    },
+    {
+      label: '(' + approvedReq.length + ') Approved',
+      value: '3',
+    },
+    {
+      label: '(' + rejectedReq.length + ') Rejected',
+      value: '4',
+    },
+  ];
+
+  const handleChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const filteringData = (data) =>
+    data.reduce((result, item) => {
+      const tReqDate = format(new Date(item.talentRequestDate), 'd MMMM yyyy', { locale: id });
+      const existingEntry = result.find((entry) => entry.talentRequestDate === tReqDate);
+      if (existingEntry) {
+        existingEntry.talentData.push(item);
+      } else {
+        result.push({
+          talentRequestDate: tReqDate,
+          talentData: [item],
+        });
+      }
+      return result;
+    }, []);
+
+  const tabPanelData = [
+    {
+      value: '1',
+      data: filteringData(allRequest),
+    },
+    {
+      value: '2',
+      data: filteringData(onProgReq),
+    },
+    {
+      value: '3',
+      data: filteringData(approvedReq),
+    },
+    {
+      value: '4',
+      data: filteringData(rejectedReq),
+    },
+  ];
+
   const navigate = useNavigate();
 
-  const statusColorMap = {
-    1: '#30A952', // Approved
-    2: '#CF1D1D', // Rejected
-    3: '#F2C103', // On Progress
+  const navigateToSignIn = () => {
+    navigate('/client');
   };
 
-  const statusStringMap = {
-    1: 'Approved', // Approved
-    2: 'Rejected', // Rejected
-    3: 'On Progress', // On Progress
+  const handleWarnArr = {
+    login: navigateToSignIn,
+    error: null,
   };
 
-  const handleSeeDetail = (talentId) => {
-    navigate('/detail/' + talentId);
+  const handleWarnAlert = (title, descrip, handle) => {
+    setWarnTitle(title);
+    setWarnDesc(descrip);
+    setHandleWarn(handle);
+    setIsWarnOpen(true);
   };
 
-  const handleDownloadCV = (talentId, talentName) => {
-    downloadCV(talentId)
+  const handleSuccessAlert = (title, descrip) => {
+    setSuccessTitle(title);
+    setSuccessDesc(descrip);
+  };
+
+  const handleFetchReq = (status, handleSet) => {
+    fetchRequest(userId, status)
       .then((response) => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-
-        // Determine the filename for the downloaded file
-        let filename = 'CV ' + talentName + '.pdf';
-        const contentDispositionHeader = response.headers['content-disposition'];
-        if (contentDispositionHeader && typeof contentDispositionHeader === 'string') {
-          const filenameMatch = contentDispositionHeader.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-          if (filenameMatch && filenameMatch[1]) {
-            filename = filenameMatch[1].replace(/['"]/g, '');
-          }
+        console.log(response);
+        if (response.status === 200) {
+          handleSet(response.data);
         }
-
-        // Create a URL object from the blob data
-        const blobUrl = window.URL.createObjectURL(blob);
-
-        // Create a temporary <a> element to trigger the download
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename;
-        link.click();
-
-        // Clean up the temporary URL object
-        window.URL.revokeObjectURL(blobUrl);
-
-        console.log('CV berhasil di download');
       })
       .catch((error) => {
-        console.error('Error downloading CV:', error);
+        console.error(error);
+        handleWarnAlert(error.response.status, error.response.message, null);
       });
   };
 
-  return (
-    <div>
-      {accordionData.map((item, index) => (
-        <Accordion
-          key={index}
-          sx={{ backgroundColor: 'white', boxShadow: '0px 5px 20px 0px rgba(0,0,0,0.1)', borderRadius: '5px' }}
-          defaultExpanded={true}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel${index + 1}-content`} id={`panel${index + 1}-header`}>
-            <Typography sx={{ fontWeight: '700', fontFamily: 'Poppins', marginLeft: '20px' }}>{item.talentRequestDate}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Container sx={{ my: '1rem' }}>
-              {item.talentData.map((talent, talentIndex) => (
-                <React.Fragment key={talentIndex} data-testid={'accordion-item-' + talent.talentId}>
-                  <Grid
-                    container
-                    sx={{
-                      display: 'flex',
-                      my: '1.5rem',
-                      padding: { xs: '20px 30px', sm: '0px' },
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      boxShadow: { xs: '0px 5px 20px 0px rgba(0,0,0,0.1)', sm: 'none' },
-                      borderRadius: '10px',
-                      py: { xs: '1rem', sm: '0' },
-                    }}
-                  >
-                    <Grid
-                      container
-                      sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', flexGrow: '1', width: 'auto' }}
-                      key={talentIndex}
-                    >
-                      <Grid item>
-                        <Avatar src={talent.talentPhotoUrl} sx={{ width: 75, height: 75 }} />
-                      </Grid>
-                      <Grid item sx={{ mx: '2rem' }}>
-                        <Grid container sx={{ mb: '0.2rem', gap: '0.5rem', alignItems: 'center' }}>
-                          <Grid item>
-                            <Chip
-                              label={
-                                <Typography color="white" sx={{ fontFamily: 'Inter', fontWeight: '700' }}>
-                                  {statusStringMap[talent.talentRequestStatusId]}
-                                </Typography>
-                              }
-                              size="small"
-                              sx={{
-                                backgroundColor: statusColorMap[talent.talentRequestStatusId] || '#848484',
-                                padding: 2,
-                              }}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <Typography fontWeight={'bold'} color="primary" fontSize={'18pt'} sx={{ color: '#2C8AD3', fontFamily: 'Poppins' }}>
-                              {talent.talentName}
-                            </Typography>
-                          </Grid>
-                        </Grid>
+  const warnLogin = () => {
+    const title = 'Access Forbidden!';
+    const descrip = 'You should login first!';
+    handleWarnAlert(title, descrip, 'login');
+  };
 
-                        <Grid container sx={{ mb: '0.75rem', gap: '0.5rem', alignItems: 'center' }}>
-                          <Grid item>
-                            <Typography variant="body2" sx={{ color: '#848484' }}>
-                              {talent.talentExperience} Years of Experience
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            <Box sx={{ width: '4px', height: '4px', backgroundColor: '#848484', borderRadius: '100%' }} />
-                          </Grid>
-                          <Grid item>
-                            <Typography variant="body2" sx={{ color: '#848484' }}>
-                              {talent.talentLevel} Level
-                            </Typography>
-                          </Grid>
-                        </Grid>
+  const getData = () => {
+    if (userId !== undefined) {
+      handleFetchReq(undefined, setAllRequest);
+      handleFetchReq(1, setApprovedReq);
+      handleFetchReq(2, setRejectedReq);
+      handleFetchReq(3, setOnProgReq);
+    } else {
+      warnLogin();
+    }
+  };
 
-                        <Typography fontWeight={'bold'}>Position</Typography>
-                        <Grid container>
-                          {talent.position.map((positionItem, positionIndex) => (
-                            <Box
-                              key={positionIndex}
-                              sx={{
-                                mr: '0.5rem',
-                                backgroundColor: '#E4EEF6',
-                                borderRadius: '3px',
-                                mb: 1.5,
-                              }}
-                              width="fit-content"
-                            >
-                              <Typography sx={{ p: '2px 5px' }}>{positionItem.positionName}</Typography>
-                            </Box>
-                          ))}
-                        </Grid>
-                        <Typography sx={{ mt: '1rem' }} fontWeight={'bold'}>
-                          Skill Set
-                        </Typography>
-                        <Grid container>
-                          {talent.skillSet.map((skillItem, skillIndex) => (
-                            <Box
-                              key={skillIndex}
-                              sx={{
-                                mr: '0.5rem',
-                                backgroundColor: '#E4EEF6',
-                                borderRadius: '3px',
-                                mb: 1.5,
-                              }}
-                              width="fit-content"
-                            >
-                              <Typography sx={{ p: '2px 5px' }}>{skillItem.skillsetName}</Typography>
-                            </Box>
-                          ))}
-                        </Grid>
+  useEffect(() => {
+    getData();
+  }, []);
 
-                        {/* ... other details */}
-                      </Grid>
-                    </Grid>
-
-                    <Grid item sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'row', alignItems: 'center' }}>
-                      <Divider orientation="vertical" />
-                      <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <Button
-                          onClick={() => handleSeeDetail(talent.talentId)}
-                          startIcon={<KeyboardArrowRightIcon />}
-                          sx={{ textTransform: 'none' }}
-                        >
-                          See Detail
-                        </Button>
-                        <Button
-                          onClick={() => handleDownloadCV(talent.talentId, talent.talentName)}
-                          startIcon={<SimCardDownloadOutlined />}
-                          sx={{ color: '#848484', textTransform: 'none' }}
-                        >
-                          Download CV
-                        </Button>
-                      </Container>
-                    </Grid>
-                  </Grid>
-                  {talentIndex !== item.talentData.length - 1 && <Divider sx={{ my: '1rem' }} />}
-                </React.Fragment>
-              ))}
-            </Container>
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </div>
-  );
-};
-
-const MyRequest = () => {
   return (
     <>
-      <AccordionComp data={null} />
+      <WarningAlert
+        title={warnTitle}
+        description={warnDesc}
+        open={isWarnOpen}
+        close={() => {
+          setIsWarnOpen(false);
+        }}
+        handleClick={handleWarnArr[handleWarn]}
+      />
+      <SuccessAlert
+        title={successTitle}
+        description={successDesc}
+        open={isSuccessOpen}
+        close={() => {
+          setIsSuccessOpen(false);
+        }}
+      />
+      <Navbar />
+      <Box
+        sx={{
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Container sx={{ my: '3rem' }}>
+          <Container sx={{ marginLeft: '50px' }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: '700',
+                fontSize: '27px',
+                fontStyle: 'normal',
+              }}
+            >
+              My Request
+            </Typography>
+          </Container>
+
+          <TabContext value={tabValue}>
+            <Container>
+              <Box
+                sx={{
+                  boxShadow: '0px 0px 20px 5px rgba(0,0,0,0.1)',
+                  mt: '2.5rem',
+                  mb: '2',
+                }}
+              >
+                <TabList onChange={handleChange}>
+                  {tabAtribute.map((item, index) => (
+                    <Tab
+                      key={index}
+                      label={item.label}
+                      value={item.value}
+                      sx={{ textTransform: 'none', width: '25%', fontFamily: 'Poppins', fontSize: '12pt' }}
+                    />
+                  ))}
+                </TabList>
+              </Box>
+            </Container>
+
+            {tabPanelData.map((item, index) => (
+              <TabPanel key={index} value={item.value}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    boxShadow: '0px 5px 20px 0px rgba(0,0,0,0.1)',
+                    borderRadius: '5px',
+                    padding: '15px 50px',
+                    mb: 3,
+                    gap: '20px',
+                    height: '20px',
+                  }}
+                >
+                  <InfoOutlined sx={{ color: 'gold', mr: 1, fontSize: '2rem' }} />
+                  <Typography sx={{ fontFamily: 'Poppins', fontSize: '12pt' }}>All requests are checked by Tujuh Sembilan Admin</Typography>
+                </Box>
+                <AccordionComp data={item.data} warn={warnLogin} sucOpen={() => setIsSuccessOpen(true)} success={handleSuccessAlert} />
+              </TabPanel>
+            ))}
+          </TabContext>
+        </Container>
+      </Box>
     </>
   );
 };

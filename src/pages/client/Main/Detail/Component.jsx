@@ -14,9 +14,11 @@ export const TagInfo = ({ tag }) => {
 
 export const LabelInfo = (props) => {
   const { title, data } = props;
+
   return (
     <Typography variant="body2" fontFamily="Inter">
-      {data ? data : '0' + ' ' + title}
+      {data ? data : '0'}
+      {' ' + title}
     </Typography>
   );
 };

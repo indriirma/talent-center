@@ -95,6 +95,7 @@ const Main = () => {
     setIsLoading(true);
     fetchTalentList(currentPage, entriesPerPage)
       .then((response) => {
+        console.log(response);
         setDisplayedTalents(response.data.content);
         setTotalTalents(response.data.totalElements);
         setTotalPage(response.data.totalPages);

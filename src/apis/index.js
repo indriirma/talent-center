@@ -75,13 +75,12 @@ export const downloadCV = async (talentId) => {
   return await axios.post(url, { responseType: 'arraybuffer' });
 };
 
-export const fetchDataTalent = async (talentId) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/talent-management/talents/${talentId}`);
-    return await response.data;
-  } catch (error) {
-    throw error;
-  }
+export const fetchDataTalent = (talentId) => {
+  return axios.get(`${API_BASE_URL}/talent-management/talents/${talentId}`);
+  // try {
+  // } catch (error) {
+  //   throw error;
+  // }
 };
 
 //API for my wishlist page
@@ -130,6 +129,20 @@ export const requestAllWishlist = async (userId, wishlist) => {
       wishlist: wishlist,
     };
     return await axios.post(url, reqBody);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const fetchRequest = async (userId, statusId) => {
+  try {
+    const url = `${API_BASE_URL}/talent-management/requests`;
+    return await axios.get(url, {
+      params: {
+        userId: userId,
+        statusId: statusId,
+      },
+    });
   } catch (error) {
     console.error(error);
   }
