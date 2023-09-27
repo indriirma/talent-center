@@ -46,13 +46,17 @@ export const fetchSearchTags = async (value) => {
 };
 
 //API for Main Page
-export const fetchTalentList = async (currentPage, entries, sortBy) => {
+export const fetchTalentList = async (currentPage, entries, sortBy, talentLevelIds, talentPositionIds, experiences, skillsetIds) => {
   const url = `${API_BASE_URL}/talent-management/talents`;
   return await axios.get(url, {
     params: {
       sortBy: sortBy,
       size: entries,
       page: currentPage - 1,
+      talentPositionIds: talentPositionIds,
+      talentLevelIds: talentLevelIds,
+      experiences: experiences,
+      skillsetIds: skillsetIds,
     },
   });
 };
@@ -76,11 +80,11 @@ export const downloadCV = async (talentId) => {
 };
 
 export const fetchDataTalent = (talentId) => {
-  return axios.get(`${API_BASE_URL}/talent-management/talents/${talentId}`);
-  // try {
-  // } catch (error) {
-  //   throw error;
-  // }
+  try {
+    return axios.get(`${API_BASE_URL}/talent-management/talents/${talentId}`);
+  } catch (error) {
+    throw error;
+  }
 };
 
 //API for my wishlist page

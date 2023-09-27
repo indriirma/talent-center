@@ -42,7 +42,7 @@ const Wishlist = () => {
         })
         .catch((error) => {
           console.error(error);
-          handleWarnAlert(error.response.status, error.response.message, 'error');
+          if (userId !== undefined) handleWarnAlert(error.response.status, error.response.message, 'error');
         });
     }
   };

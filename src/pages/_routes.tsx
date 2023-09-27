@@ -15,7 +15,13 @@ import DaftarTalent from './admin/DaftarTalent';
 import Dashboard from './admin/Dashboard';
 import TambahTalent from './admin/TambahTalent';
 import LandingPage from './client/landing-page';
-import Main from './client/Main/Dashboard'
+import Main from './client/Main/Dashboard';
+import DetailTalent from './admin/DetailTalent';
+import EditTalent from './admin/EditTalent';
+import TalentApproval from './admin/TalentApproval.jsx';
+import Wishlist from './client/Main/My-wishlist';
+import MyRequest from './client/Main/My-request';
+import Detail from './client/Main/Detail';
 
 const routes: SecurableRoute[] = [
   {
@@ -52,15 +58,15 @@ const routes: SecurableRoute[] = [
           },
           {
             path: 'wishlist',
-            element:<Main/>
+            element:<Wishlist/>
           },
           {
             path: 'request',
-            element:<Main/>
+            element:<MyRequest/>
           },
           {
             path: 'detail/:id',
-            element:<Main/>
+            element:<Detail/>
           }
         ],
       },
@@ -148,7 +154,7 @@ const routes: SecurableRoute[] = [
           {
             index: true,
             // element: <Talent />,
-            element: <TambahT />,
+            // element: <TambahT />,
           },
         ],
       },

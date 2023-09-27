@@ -42,6 +42,11 @@ const Main = () => {
   const { state } = useLocation();
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState();
+  const [selectedExperience, setSelectedExperience] = useState([]);
+  const [selectedLevels, setSelectedLevels] = useState([]);
+  const [selectedPositions, setSelectedPositions] = useState([]);
+  const [selectedSkillsets, setSelectedSkillsets] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
   const [totalTalents, setTotalTalents] = useState(0);
   const [displayedTalents, setDisplayedTalents] = useState([]);
@@ -86,6 +91,10 @@ const Main = () => {
     setCurrentPage(newpage);
   };
 
+  const handleFilterChange = (value, setFilterChange) => {
+    setFilterChange(value);
+  };
+
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
   const userId = cookieData.userId;
@@ -93,7 +102,7 @@ const Main = () => {
   useEffect(() => {
     console.log(state);
     setIsLoading(true);
-    fetchTalentList(currentPage, entriesPerPage)
+    fetchTalentList(currentPage, entriesPerPage, sortBy, selectedLevels, selectedPositions, selectedExperience, selectedSkillsets)
       .then((response) => {
         console.log(response);
         setDisplayedTalents(response.data.content);
@@ -106,7 +115,7 @@ const Main = () => {
       .finally(() => {
         setIsLoading(false); // Set loading to false when data fetching is done
       });
-  }, [currentPage, entriesPerPage]);
+  }, [currentPage, entriesPerPage, selectedExperience, selectedLevels, selectedPositions, selectedSkillsets, sortBy]);
 
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, totalTalents);
@@ -131,7 +140,16 @@ const Main = () => {
         <Navbar />
         <Stack direction="row" sx={{ backgroundColor: 'white' }}>
           <Box sx={{ display: { xs: 'none', sm: 'block' }, py: 6, px: 4, boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.10)' }}>
-            <SideBar></SideBar>
+            <SideBar
+              selectedPositions={selectedPositions}
+              handlePositionFilterChange={setSelectedPositions}
+              selectedExperience={selectedExperience}
+              handleExperienceFilterChange={setSelectedExperience}
+              selectedLevels={selectedLevels}
+              handleLevelFilterChange={setSelectedLevels}
+              selectedSkillsets={selectedSkillsets}
+              handleSkillsetFilterChange={setSelectedSkillsets}
+            />
           </Box>
 
           <Box flex={0} sx={{ flexGrow: 1, my: 4, mx: 3 }}>
@@ -162,7 +180,16 @@ const Main = () => {
                 <Close />
               </Button>
               <Box sx={{ my: 2, mx: 2 }}>
-                <SideBar></SideBar>
+                <SideBar
+                  selectedPositions={selectedPositions}
+                  handlePositionFilterChange={setSelectedPositions}
+                  selectedExperience={selectedExperience}
+                  handleExperienceFilterChange={setSelectedExperience}
+                  selectedLevels={selectedLevels}
+                  handleLevelFilterChange={setSelectedLevels}
+                  selectedSkillsets={selectedSkillsets}
+                  handleSkillsetFilterChange={setSelectedSkillsets}
+                />
               </Box>
             </Drawer>
 
