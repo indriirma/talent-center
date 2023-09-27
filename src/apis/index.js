@@ -147,3 +147,11 @@ export const fetchRequest = async (userId, statusId) => {
     console.error(error);
   }
 };
+
+export const getAllTalent = (talentName, sortBy) => axios.get(`${API_BASE_URL}/talent-management/talents`);
+
+export const getLevels = () => axios.get(`${API_BASE_URL}/master-management/talent-level-option-lists`);
+
+export const getEmployeeStatus = () => axios.get(`${API_BASE_URL}/master-management/employee-status-option-lists`);
+
+export const getSkills = () => axios.get(`${API_BASE_URL}/master-management/skill-set-option-lists`);

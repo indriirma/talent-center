@@ -15,10 +15,7 @@ import DaftarTalent from './admin/DaftarTalent';
 import Dashboard from './admin/Dashboard';
 import TambahTalent from './admin/TambahTalent';
 import LandingPage from './client/landing-page';
-import Main from './client/Main/Dashboard';
-import Detail from './client/Main/Detail';
-import Wishlist from './client/Main/My-wishlist';
-import MyRequest from './client/Main/My-request';
+import Main from './client/Main/Dashboard'
 
 const routes: SecurableRoute[] = [
   {
@@ -48,22 +45,22 @@ const routes: SecurableRoute[] = [
             <Outlet />
           </ThemeProvider>
         ),
-        children:[
+        children: [
           {
             index: true,
-            element: <Main/>,
+            element: <Main />,
           },
           {
             path: 'wishlist',
-            element:<Wishlist/>
+            element:<Main/>
           },
           {
             path: 'request',
-            element:<MyRequest/>
+            element:<Main/>
           },
           {
             path: 'detail/:id',
-            element:<Detail/>
+            element:<Main/>
           }
         ],
       },
@@ -97,7 +94,7 @@ const routes: SecurableRoute[] = [
       },
       {
         path: 'daftar-talent',
-        element: <DashboardLayout />,
+        //element: <DashboardLayout />,
         children: [
           {
             index: true,
@@ -107,11 +104,51 @@ const routes: SecurableRoute[] = [
       },
       {
         path: 'tambah-talent',
-        element: <DashboardLayout />,
+        // element: <DashboardLayout />,
         children: [
           {
             index: true,
             element: <TambahTalent />,
+          },
+        ],
+      },
+      {
+        path: 'detail-talent/:talentId',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <DetailTalent />,
+          },
+        ],
+      },
+      {
+        path: 'edit-talent/:talentId',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <EditTalent />,
+          },
+        ],
+      },
+      {
+        path: 'talent-approval',
+        // element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <TalentApproval />,
+          },
+        ],
+      },
+      {
+        path: 'talent',
+        children: [
+          {
+            index: true,
+            // element: <Talent />,
+            element: <TambahT />,
           },
         ],
       },

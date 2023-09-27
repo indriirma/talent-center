@@ -61,7 +61,7 @@ const DashboardLayout = () => {
   return (
     <BoxContainer fit="stretch-to-view">
       <GenericLayout barPosition="left">
-        <Bar component={Card} sx={(theme) => ({ width: 250, borderRadius: 0, pt: `calc(60px + ${theme.spacing(2)})`, pb: 2 })}>
+        <Bar component={Card} sx={(theme) => ({ width: 250, borderRadius: 0, pt: `calc(60px + ${theme.spacing(0)})`, pb: 0 })}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <img
               src={`${process.env.PUBLIC_URL}/resource/image/logoberwarna.png`}

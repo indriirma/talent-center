@@ -1,14 +1,12 @@
-import { Edit, Search, Visibility as VisibilityIcon } from '@mui/icons-material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {
   Avatar,
+  Box,
   Button,
+  Chip,
   FormControl,
-  Grid,
   IconButton,
-  InputAdornment,
-  InputLabel,
   MenuItem,
+  Pagination,
   Select,
   Table,
   TableBody,
@@ -19,139 +17,223 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { getAllTalent } from 'apis';
+import { useNavigate } from 'react-router-dom';
+import AdminLayout from 'layouts/AdminLayout';
 
-function DaftarTalent() {
-  const rows = [
-    { name: 'John Doe', avatar: '/path/to/avatar1.jpg', level: 'Intermediate', pengalaman: '5 years', status: 'Active', kepegawaian: 'Full-time' },
-  ];
+const buttonEntriesStyle = {
+  marginRight: '4px',
+  borderRadius: '4px',
+  width: '28px',
+  minWidth: '0px',
+  height: '27px',
+  paddingLeft: 'auto',
+  paddingRight: 'auto',
+};
 
-  const [data, setData] = useState([]);
+const colorHitamStyle = { color: '#3B4758' };
+
+const headerStyle = { padding: 0, paddingLeft: 2, color: '#7D8FA9', py: '2px' };
+
+const greyChipStyle = { background: '#586A84', color: '#FFF', paddingLeft: '5px', paddingRight: '5px' };
+
+const greenChipStyle = { backgroundColor: '#30A952', color: '#FFF', paddingLeft: '5px', paddingRight: '5px' };
+
+const redChipStyle = { backgroundColor: '#CF1D1D', color: '#FFF', paddingLeft: '5px', paddingRight: '5px' };
+
+const silverChipStyle = { background: '#DBDBDB', color: '#586A84', paddingLeft: '5px', paddingRight: '5px' };
+
+const DebounceDelay = 1000;
+
+const DaftarTalents = () => {
+  const [selectValue, setSelectValue] = useState('');
+  const [entries, setEntries] = React.useState(10);
+  const [page, setPage] = React.useState(1);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(9);
+  const [dataTalents, setDataTalents] = useState([]);
+  const [request, setRequest] = useState({
+    name: '',
+    sortBy: '',
+  });
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const navigate = useNavigate();
+
+  axios.defaults.withCredentials = true;
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/talent-management/talents`, {
+        params: {
+          sortBy: request.sortBy,
+          page: page -1,
+          size: entries,
+          talentName: request.name,
+        },
+      });
+      setDataTalents(response.data.content);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const getDataTalents = () => {
+    fetchData();
+  };
+
+  const handleChangeEntries = (value) => {
+    setEntries(value);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const handleChangeSelect = (event) => {
+    setSelectValue(event.target.value);
+  };
+
+  const handleChangeSearch = (value) => {
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    const newTypingTimeout = setTimeout(() => {
+      setRequest({ ...request, name: value });
+      getDataTalents(value, request.sortBy);
+    }, DebounceDelay);
+
+    setTypingTimeout(newTypingTimeout);
+  };
+
+  const handleTambahTalentClick = () => {
+    navigate('/admin/tambah-talent');
+    window.location.reload();
+  };
+
+  const handleDetail = (talentId) => {
+    navigate(`/admin/detail-talent/${talentId}`);
+  };
+
+  const handleEdit = (talentId) => {
+    navigate(`/admin/edit-talent/${talentId}`);
+  };
 
   useEffect(() => {
-    axios
-      .get('http://localhost:8080/api/talent-management/talents')
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+    fetchData();
+  }, [page, entries, request]);
+  
+
   return (
-    <Grid container direction="column" spacing={2}>
+    <AdminLayout>
       <Typography
-        variant="h4"
-        sx={{
-          fontFamily: 'Poppins',
-          fontSize: '30px',
-          fontWeight: '500',
-          marginBottom: '10px',
-          textAlign: 'left',
-          marginLeft: '15px',
-          marginTop: '10px',
-        }}
+        sx={{ color: '#3B4758', fontFamily: 'Poppins', fontSize: '22px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', mb: '24px' }}
       >
         Daftar Talent
       </Typography>
-      <Grid container item xs={12} sm={12} spacing={2}>
-        <Grid item xs={4} sm={4}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            sx={{ backgroundColor: 'white' }}
-            placeholder="Search"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
+      <Box sx={{ gap: '4px', width: '100%' }}>
+        <TextField
+          id="search"
+          placeholder="Search..."
+          variant="outlined"
+          size="small"
+          onChange={(event) => handleChangeSearch(event.target.value)}
+          sx={{
+            borderRadius: '6px',
+            border: '1px solid #2C8AD3',
+            background: '#FFF',
+            width: '260px',
+            padding: '0px',
+            mr: '8px',
+          }}
+          InputProps={{
+            startAdornment: <SearchIcon style={{ color: '#2C8AD3', marginLeft: '-7px', marginRight: '2px' }} />,
+          }}
+        />
+        <FormControl sx={{ border: '1.5px solid #2C8AD3', borderRadius: '6px' }}>
+          <Select
+            size="small"
+            value={selectValue}
+            onChange={handleChangeSelect}
+            displayEmpty
+            // inputProps={{ 'aria-label': 'Without label' }}
+            sx={{
+              width: '200px',
+              background: '#FFF',
+              '& .MuiOutlinedInput-root': {
+                borderColor: '#2C8AD3', // Ubah warna tepi di sini
+              },
             }}
-          />
-        </Grid>
-        <Grid item xs={4} sm={4}>
-          <FormControl sx={{ width: '200px', height: '40px' }} fullWidth>
-            <InputLabel id="demo-simple-select-helper-label">Select</InputLabel>
-            <Select labelId="demo-simple-select-helper-label" id="demo-simple-select-helper" label="Select" sx={{ backgroundColor: 'white' }}>
-              <MenuItem value={1}>L</MenuItem>
-              <MenuItem value={2}>P</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4} sm={4} sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="primary" startIcon={<AddCircleOutlineIcon />}>
-            Tambah Talent
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid item xs={12} sm={12}>
-        {/* <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Talent</TableCell>
-                <TableCell align="right">Level</TableCell>
-                <TableCell align="right">Pengalaman</TableCell>
-                <TableCell align="right">Status</TableCell>
-                <TableCell align="right">Kepegawaian</TableCell>
-                <TableCell align="center">Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell component="th" scope="row" sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar alt={row.name} src={row.avatar} sx={{ marginRight: '10px' }} />
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.level}</TableCell>
-                  <TableCell align="right">{row.pengalaman}</TableCell>
-                  <TableCell align="right">{row.status}</TableCell>
-                  <TableCell align="right">{row.kepegawaian}</TableCell>
-                  <TableCell align="center">
-                    <IconButton color="primary">
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton color="primary">
-                      <Edit />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer> */}
+          >
+            <MenuItem sx={{ color: 'grey' }} value={''}>
+              Select ...
+            </MenuItem>
+            <MenuItem value={10}>Ten</MenuItem>
+            <MenuItem value={20}>Twenty</MenuItem>
+            <MenuItem value={30}>Thirty</MenuItem>
+          </Select>
+        </FormControl>
+        <Button onClick={handleTambahTalentClick} sx={{ float: 'right', background: '#2C8AD3', color: '#FFF', textTransform: 'none', width: '17%' }}>
+          <AddCircleOutlineIcon sx={{ fontSize: 'medium' }} /> Tambah Talent
+        </Button>
+      </Box>
+      <Box sx={{ background: '#FFF', borderRadius: '4px', mt: '21px' }}>
         <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell>Talent</TableCell>
-                <TableCell align="right">Level</TableCell>
-                <TableCell align="right">Pengalaman</TableCell>
-                <TableCell align="right">Status</TableCell>
-                <TableCell align="right">Kepegawaian</TableCell>
-                <TableCell align="center">Action</TableCell>
+                <TableCell sx={headerStyle}>Talent</TableCell>
+                <TableCell sx={headerStyle}>Level</TableCell>
+                <TableCell sx={headerStyle}>Pengalaman</TableCell>
+                <TableCell sx={headerStyle}>Status</TableCell>
+                <TableCell sx={headerStyle}>Kepegawaian</TableCell>
+                <TableCell sx={headerStyle}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.talentId}>
-                  <TableCell component="th" scope="row" sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar alt={row.talentName} src={row.talentPhotoUrl} sx={{ marginRight: '10px' }} />
-                    {row.talentName}
+              {dataTalents.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={colorHitamStyle}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Avatar
+                        //src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80"
+                        src={row.talentPhotoUrl}
+                        variant="rounded"
+                        sx={{ width: '50px', height: '50px', borderRadius: '50px' }}
+                      />
+                      <Typography style={{ marginLeft: '10px' }}>{row.talentName}</Typography>
+                    </div>
                   </TableCell>
-                  <TableCell align="right">{row.talentLevel}</TableCell>
-                  <TableCell align="right">{row.talentExperience}</TableCell>
-                  <TableCell align="right">{row.talentStatus}</TableCell>
-                  <TableCell align="right">{row.employeeStatus}</TableCell>
-                  <TableCell align="center">
-                    <IconButton color="primary">
-                      <VisibilityIcon />
+                  <TableCell sx={colorHitamStyle}>{row.talentLevel}</TableCell>
+                  <TableCell sx={colorHitamStyle}>{row.talentExperience} Tahun</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={row.talentStatus}
+                      variant="outlined"
+                      size="small"
+                      sx={row.talentStatus === 'Onsite' ? greyChipStyle : silverChipStyle}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={row.employeeStatus}
+                      variant="outlined"
+                      size="small"
+                      sx={row.employeeStatus === 'Active' ? greenChipStyle : redChipStyle}
+                    />
+                  </TableCell>
+                  <TableCell sx={colorHitamStyle}>
+                    <IconButton>
+                      <VisibilityIcon onClick={() => handleDetail(row.talentId)} />
                     </IconButton>
-                    <IconButton color="primary">
-                      <Edit />
+                    <IconButton>
+                      <BorderColorIcon onClick={() => handleEdit(row.talentId)} sx={{ color: '#2C8AD3' }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -159,9 +241,50 @@ function DaftarTalent() {
             </TableBody>
           </Table>
         </TableContainer>
-      </Grid>
-    </Grid>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px',
+            padding: '4px',
+            paddingBottom: '10px',
+            paddingTop: '10px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ padding: '4px' }}>Entries :</span>
+            <Button
+              size="small"
+              variant={entries === 10 ? 'contained' : 'outlined'}
+              onClick={() => handleChangeEntries(10)}
+              style={buttonEntriesStyle}
+            >
+              10
+            </Button>
+            <Button
+              size="small"
+              variant={entries === 20 ? 'contained' : 'outlined'}
+              onClick={() => handleChangeEntries(20)}
+              style={buttonEntriesStyle}
+            >
+              20
+            </Button>
+            <Button
+              size="small"
+              variant={entries === 50 ? 'contained' : 'outlined'}
+              onClick={() => handleChangeEntries(50)}
+              style={buttonEntriesStyle}
+            >
+              50
+            </Button>
+          </div>
+          <Pagination count={Math.ceil(dataTalents.length)} page={page} onChange={handleChangePage} />
+        </div>
+      </Box>
+    </AdminLayout>
   );
-}
+};
 
-export default DaftarTalent;
+export default DaftarTalents;
+
