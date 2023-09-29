@@ -42,7 +42,7 @@ const Main = () => {
   const { state } = useLocation();
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState();
+  const [sortBy, setSortBy] = useState('experience');
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [selectedPositions, setSelectedPositions] = useState([]);
@@ -89,10 +89,6 @@ const Main = () => {
 
   const handlePageChange = (newpage) => {
     setCurrentPage(newpage);
-  };
-
-  const handleFilterChange = (value, setFilterChange) => {
-    setFilterChange(value);
   };
 
   const dataArray = Cookies.get('loginRequirement');
@@ -173,7 +169,7 @@ const Main = () => {
                   Filter
                 </Typography>
               </Button>
-              <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
+              <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} onSortOptionChange={setSortBy} />
             </Stack>
             <Drawer anchor="right" open={isDrawerOpen} onClose={handleDrawerClose}>
               <Button onClick={handleDrawerClose} sx={{ color: 'black', justifyContent: 'end', mt: 1, mx: 1 }}>
@@ -206,7 +202,7 @@ const Main = () => {
               </Box> */}
 
                 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                  <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} />
+                  <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} onSortOptionChange={setSortBy} />
                 </Box>
 
                 <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>

@@ -6,41 +6,55 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import { fetchTalentLevel, fetchTalentPosition, fetchSkillSetType } from 'apis';
 
-const FilterAccordion = ({ title, data, idKey, nameKey, selectedItems, onChange  }) => (
-  <Accordion sx={{ backgroundColor: 'transparent', boxShadow: 'none' }} defaultExpanded>
-    <AccordionSummary expandIcon={<KeyboardArrowDownIcon />}>
-      <Typography
-        sx={{
-          color: 'black',
-          fontFamily: 'Poppins',
-          fontSize: '14px',
-          fontWeight: 700,
-          lineHeight: '21px',
-        }}
-      >
-        {title}
-      </Typography>
-    </AccordionSummary>
-    <AccordionDetails>
-      <FormGroup>
-        {data.map((item) => (
-          <FormControlLabel
-            key={item[idKey]}
-            control={<Checkbox sx={{ color: '#AFAFAF' }} />}
-            label={
-              <Typography sx={{ color: 'black', fontFamily: 'Inter', fontSize: '14px', fontWeight: 400, lineHeight: '17px' }}>
-                {item[nameKey]}
-              </Typography>
-            }
-            onChange={() => onChange(item[idKey])}
-          />
-        ))}
-      </FormGroup>
-    </AccordionDetails>
-  </Accordion>
-);
+const FilterAccordion = ({ title, data, idKey, nameKey, selectedItems, onChange }) => {
+  const handleChange = (itemId) => {
+    if (selectedItems.includes(itemId)) {
+      onChange(selectedItems.filter((id) => id !== itemId));
+    } else {
+      onChange([...selectedItems, itemId]);
+    }
+  };
+  return (
+    <Accordion sx={{ backgroundColor: 'transparent', boxShadow: 'none' }} defaultExpanded>
+      <AccordionSummary expandIcon={<KeyboardArrowDownIcon />}>
+        <Typography
+          sx={{
+            color: 'black',
+            fontFamily: 'Poppins',
+            fontSize: '14px',
+            fontWeight: 700,
+            lineHeight: '21px',
+          }}
+        >
+          {title}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <FormGroup>
+          {data.map((item) => (
+            <FormControlLabel
+              key={item[idKey]}
+              control={
+                <Checkbox
+                  sx={{ color: '#AFAFAF' }}
+                  checked={Array.isArray(selectedItems) ? selectedItems.includes(item[idKey]) : false}
+                  onChange={() => handleChange(item[idKey])}
+                />
+              }
+              label={
+                <Typography sx={{ color: 'black', fontFamily: 'Inter', fontSize: '14px', fontWeight: 400, lineHeight: '17px' }}>
+                  {item[nameKey]}
+                </Typography>
+              }
+            />
+          ))}
+        </FormGroup>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
 
-const Sidebar = (
+const Sidebar = ({
   selectedPositions,
   handlePositionFilterChange,
   selectedExperience,
@@ -48,15 +62,15 @@ const Sidebar = (
   selectedLevels,
   handleLevelFilterChange,
   selectedSkillsets,
-  handleSkillsetFilterChange
-) => {
+  handleSkillsetFilterChange,
+}) => {
   const [skillsetTypeOptions, setSkillsetTypeOptions] = useState([]);
   const [positions, setPositions] = useState([]);
   const [levels, setLevels] = useState([]);
   const experienceLevels = [
-    { id: 1, name: '5+ Years of Experience' },
+    { id: 3, name: '5+ Years of Experience' },
     { id: 2, name: '2 - 4 Years of Experience' },
-    { id: 3, name: '1 Year of Experience' },
+    { id: 1, name: '1 Year of Experience' },
   ];
 
   useEffect(() => {

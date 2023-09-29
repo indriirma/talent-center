@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Autocomplete, Typography, Stack, TextField } from '@mui/material';
+import { useState } from 'react';
 
 const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionChange }) => {
   const [selectedSortOption, setSelectedSortOption] = useState({
@@ -8,9 +8,11 @@ const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionCha
   });
   const sortingOptions = [
     { value: 'experience', label: 'Years of Experience' },
-    { value: 'ascending', label: 'A - Z' },
-    { value: 'descending', label: 'Z - A' },
+    { value: 'talentNameAsc', label: 'A - Z' },
+    { value: 'talentNameDesc', label: 'Z - A' },
   ];
+
+  // const handle
 
   const startIndex = (currentPage - 1) * talentsPerPage + 1;
   const endIndex = Math.min(startIndex + talentsPerPage - 1, totalTalents);
@@ -32,9 +34,10 @@ const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionCha
           id="sort-by-autocomplete"
           value={selectedSortOption}
           onChange={(event, newValue) => {
-            setSelectedSortOption(newValue);
             onSortOptionChange(newValue.value);
-        }}
+            setSelectedSortOption(newValue);
+            console.log('sorting : ', selectedSortOption);
+          }}
           options={sortingOptions}
           disableClearable
           getOptionLabel={(option) => option.label}

@@ -53,10 +53,10 @@ export const fetchTalentList = async (currentPage, entries, sortBy, talentLevelI
       sortBy: sortBy,
       size: entries,
       page: currentPage - 1,
-      talentPositionIds: talentPositionIds,
-      talentLevelIds: talentLevelIds,
-      experiences: experiences,
-      skillsetIds: skillsetIds,
+      talentPositionIds: talentPositionIds.join(','),
+      talentLevelIds: talentLevelIds.join(','),
+      experiences: experiences.join(','),
+      skillsetIds: skillsetIds.join(','),
     },
   });
 };
