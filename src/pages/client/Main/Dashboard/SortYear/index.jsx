@@ -1,15 +1,21 @@
-import { Autocomplete, Typography, Stack, TextField } from '@mui/material';
+import { Autocomplete, Typography, Stack, TextField, Box } from '@mui/material';
 import { useState } from 'react';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { ArrowUpward } from '@mui/icons-material';
 
-const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionChange }) => {
+const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionChange, setSorting }) => {
   const [selectedSortOption, setSelectedSortOption] = useState({
     value: 'experience',
     label: window.innerWidth < 600 ? 'Sort by' : 'Years of Experience',
   });
   const sortingOptions = [
-    { value: 'experience', label: 'Years of Experience' },
-    { value: 'talentNameAsc', label: 'A - Z' },
-    { value: 'talentNameDesc', label: 'Z - A' },
+    { value: 'talentName', label: 'A - Z', sort: false },
+    { value: 'talentName', label: 'Z - A', sort: true },
+    { value: 'experience', label: 'Years of Experience', sort: false },
+    { value: 'experience', label: 'Years of Experience', sort: true },
+    { value: 'talentLevel', label: 'Level', sort: false },
+    { value: 'talentLevel', label: 'Level', sort: true },
+    { value: 'talentAvailability', label: 'Available', sort: true },
   ];
 
   // const handle
@@ -36,11 +42,28 @@ const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionCha
           onChange={(event, newValue) => {
             onSortOptionChange(newValue.value);
             setSelectedSortOption(newValue);
+            setSorting(newValue.sort);
             console.log('sorting : ', selectedSortOption);
           }}
           options={sortingOptions}
           disableClearable
           getOptionLabel={(option) => option.label}
+          renderOption={(props, option) => (
+            <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+              <Typography fontFamily="Inter" fontSize="10pt">
+                {option.label}
+              </Typography>
+              {option.value === 'talentLevel' || option.value === 'experience' ? (
+                option.sort ? (
+                  <ArrowDownwardIcon sx={{ width: '15px' }} />
+                ) : (
+                  <ArrowUpward sx={{ width: '15px' }} />
+                )
+              ) : (
+                ''
+              )}
+            </Box>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}

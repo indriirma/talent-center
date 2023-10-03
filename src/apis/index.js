@@ -46,11 +46,12 @@ export const fetchSearchTags = async (value) => {
 };
 
 //API for Main Page
-export const fetchTalentList = async (currentPage, entries, sortBy, talentLevelIds, talentPositionIds, experiences, skillsetIds) => {
+export const fetchTalentList = async (currentPage, entries, sortBy, sort, talentLevelIds, talentPositionIds, experiences, skillsetIds) => {
   const url = `${API_BASE_URL}/talent-management/talents`;
   return await axios.get(url, {
     params: {
       sortBy: sortBy,
+      sort: sort,
       size: entries,
       page: currentPage - 1,
       talentPositionIds: talentPositionIds.join(','),

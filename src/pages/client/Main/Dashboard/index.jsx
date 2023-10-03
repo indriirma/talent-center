@@ -43,6 +43,7 @@ const Main = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('experience');
+  const [sort, setSort] = useState(false);
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [selectedPositions, setSelectedPositions] = useState([]);
@@ -98,7 +99,7 @@ const Main = () => {
   useEffect(() => {
     console.log(state);
     setIsLoading(true);
-    fetchTalentList(currentPage, entriesPerPage, sortBy, selectedLevels, selectedPositions, selectedExperience, selectedSkillsets)
+    fetchTalentList(currentPage, entriesPerPage, sortBy, sort, selectedLevels, selectedPositions, selectedExperience, selectedSkillsets)
       .then((response) => {
         console.log(response);
         setDisplayedTalents(response.data.content);
@@ -111,7 +112,7 @@ const Main = () => {
       .finally(() => {
         setIsLoading(false); // Set loading to false when data fetching is done
       });
-  }, [currentPage, entriesPerPage, selectedExperience, selectedLevels, selectedPositions, selectedSkillsets, sortBy]);
+  }, [currentPage, entriesPerPage, selectedExperience, selectedLevels, selectedPositions, selectedSkillsets, sortBy, sort]);
 
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, totalTalents);
@@ -169,7 +170,13 @@ const Main = () => {
                   Filter
                 </Typography>
               </Button>
-              <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} onSortOptionChange={setSortBy} />
+              <SortYear
+                currentPage={currentPage}
+                talentsPerPage={entriesPerPage}
+                totalTalents={totalTalents}
+                onSortOptionChange={setSortBy}
+                setSorting={setSort}
+              />
             </Stack>
             <Drawer anchor="right" open={isDrawerOpen} onClose={handleDrawerClose}>
               <Button onClick={handleDrawerClose} sx={{ color: 'black', justifyContent: 'end', mt: 1, mx: 1 }}>
@@ -188,23 +195,21 @@ const Main = () => {
                 />
               </Box>
             </Drawer>
-
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <SortYear
+                currentPage={currentPage}
+                talentsPerPage={entriesPerPage}
+                totalTalents={totalTalents}
+                onSortOptionChange={setSortBy}
+                setSorting={setSort}
+              />
+            </Box>
             {isLoading ? ( // Render loading indicator while data is being fetched
               <Box sx={{ width: '100%' }}>
                 <LinearProgress />
               </Box>
             ) : totalTalents !== 0 ? (
               <React.Fragment>
-                {/* <Box sx={{ display: { xs: 'flex', sm: 'none' }, mt: '2.5rem' }}>
-                <Typography sx={{ color: '#212121', fontFamily: 'Inter', lineHeight: 'normal' }} variant="body1">
-                  Showing you {(currentPage - 1) * entriesPerPage + 1} - {endIndex} talents out of {totalTalents} total for <b>“JavaScript”</b>
-                </Typography>
-              </Box> */}
-
-                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                  <SortYear currentPage={currentPage} talentsPerPage={entriesPerPage} totalTalents={totalTalents} onSortOptionChange={setSortBy} />
-                </Box>
-
                 <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
                   {displayedTalents.map((talent) => (
                     <Grid item xs={12} md={6} key={talent.talentId}>

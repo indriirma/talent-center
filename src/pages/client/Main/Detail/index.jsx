@@ -232,13 +232,13 @@ const Detail = () => {
                       fontFamily="Inter"
                       sx={{
                         padding: '2px 8px',
-                        color: dataTalent.talentStatus === 'Onsite' ? 'green' : 'red',
+                        color: dataTalent.talentAvailability === false ? 'red' : 'green',
                         border: 'solid',
                         borderWidth: '1px',
                         borderRadius: '15px',
                       }}
                     >
-                      {dataTalent.talentStatus}
+                      {dataTalent.talentAvailability === false ? 'Not Available' : 'Available'}
                     </Typography>
                   </Grid>
                   <Grid item>

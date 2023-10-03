@@ -53,9 +53,7 @@ export const WarningAlert = ({ title, description, open, close, handleClick }) =
           <Typography fontSize="14pt" textAlign="center" fontWeight="bold" color="#848484">
             {title}
           </Typography>
-          <Typography fontSize="10pt" textAlign="center" color="#848484">
-            {description}
-          </Typography>
+          <Typography dangerouslySetInnerHTML={{ __html: description }} fontSize="10pt" textAlign="center" color="#848484" />
         </DialogTitle>
         <DialogContent>
           <Box display="flex" justifyContent="center">

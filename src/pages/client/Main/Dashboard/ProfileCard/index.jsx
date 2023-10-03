@@ -106,13 +106,13 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
                 fontFamily="Inter"
                 sx={{
                   padding: '1px 4px',
-                  color: talentDetail?.talentStatus === 'Available' || 'Onsite' ? 'green' : 'red',
+                  color: talentDetail?.talentAvailability === false ? 'red' : 'green',
                   border: 'solid',
                   borderWidth: '1px',
                   borderRadius: '15px',
                 }}
               >
-                {talentDetail?.talentStatus}
+                {talentDetail?.talentAvailability === false ? 'Not Available' : 'Available'}
               </Typography>
             </Grid>
             <Grid item>

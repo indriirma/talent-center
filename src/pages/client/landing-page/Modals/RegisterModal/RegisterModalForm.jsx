@@ -96,9 +96,17 @@ const RegisterModalForm = ({ regOpen, regClose, signInOpen }) => {
         handleSuccessAlert(title, desc);
       }
     } catch (error) {
-      console.error('Error : ', error);
+      console.error('Error PAI : ', error.response);
       if (error.response) {
-        handleWarnAlert(error.response.status, error.response.message);
+        if (error.response.data.errors === undefined) {
+          handleWarnAlert(error.response.status, error.response.data.message);
+        } else {
+          let message = '';
+          error.response.data.errors.forEach((err) => {
+            message += err.defaultMessage + '<br />';
+          });
+          handleWarnAlert(error.response.status, message);
+        }
       }
     }
   };
