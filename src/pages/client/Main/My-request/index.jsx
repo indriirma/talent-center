@@ -94,7 +94,7 @@ const MyRequest = () => {
 
   const handleWarnArr = {
     login: navigateToSignIn,
-    error: null,
+    error: () => {},
   };
 
   const handleWarnAlert = (title, descrip, handle) => {

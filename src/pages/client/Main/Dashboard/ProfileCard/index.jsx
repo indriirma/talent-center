@@ -228,11 +228,11 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
             <Button
               startIcon={<AddOutlined />}
               onClick={() => handleAddToList(talentDetail.talentId)}
-              disabled={inWishlist}
+              disabled={inWishlist || !talentDetail.talentAvailability}
               sx={{ textTransform: 'none', borderColor: '#2C8AD3', fontFamily: 'Inter' }}
               variant="outlined"
             >
-              {inWishlist ? 'In Wishlist' : 'Add to List'}
+              {inWishlist || !talentDetail.talentAvailability ? 'In Wishlist' : 'Add to List'}
             </Button>
             <Button
               endIcon={<KeyboardArrowRight />}

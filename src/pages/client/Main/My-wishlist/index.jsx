@@ -59,7 +59,7 @@ const Wishlist = () => {
 
   const handleWarnArr = {
     login: navigateToSignIn,
-    error: null,
+    error: () => {},
   };
 
   useEffect(() => {
@@ -100,18 +100,43 @@ const Wishlist = () => {
       });
   };
 
-  const handleRequest = () => {
+  const handleRequest = async () => {
     const wishlist = talentData.map((item) => ({ wishlistId: item.wishlistId }));
-    requestAllWishlist(userId, wishlist)
+    await requestAllWishlist(userId, wishlist)
       .then((response) => {
         if (response.status === 200) {
-          getDataWishlist();
           const title = 'Your Request is in Process!';
           const description = 'You can check your request status at "My Request" menu';
           handleSuccessAlert(title, description);
         } else {
-          handleWarnAlert(response.status, response.message, 'error');
+          let title = response.response.data.status;
+          let message = response.response.data.message;
+          const match = message.match(/\[(.*?)\]/);
+          let talents = '';
+          if (match) {
+            const wishIds = match[1].split(',').map(Number);
+            talentData.forEach((talent) => {
+              wishIds.forEach((wish, idx) => {
+                if (talent.wishlistId === wish) {
+                  if (idx !== 0) {
+                    talents += ' and ';
+                  }
+                  talents += talent.talentName;
+                }
+              });
+            });
+          }
+          if (message.substr(-13) === 'not available') {
+            console.log(message);
+            title = 'Talent ' + talents + ' No Longer Available';
+            message = 'You can choose other talent to replace them';
+          } else if (message.substr(-25) === 'not found or unauthorized') {
+            title = 'Talent ' + talents + ' Not Found or Unauthorized';
+            message = 'You can choose other talent in main page';
+          }
+          handleWarnAlert(title, message, 'error');
         }
+        getDataWishlist();
       })
       .catch((error) => {
         console.error('error fetching API : ' + error);
@@ -209,11 +234,13 @@ const Wishlist = () => {
                             <Grid item>
                               <Chip
                                 label={
-                                  <Typography sx={{ fontFamily: 'Inter', fontWeight: '400', fontSize: '10pt' }}>{dataTalent.talentStatus}</Typography>
+                                  <Typography sx={{ fontFamily: 'Inter', fontWeight: '400', fontSize: '10pt' }}>
+                                    {dataTalent?.talentAvailability === false ? 'Not Available' : 'Available'}
+                                  </Typography>
                                 }
                                 variant="outlined"
                                 size="small"
-                                sx={{ color: '#30A952', padding: '2' }}
+                                sx={{ color: dataTalent?.talentAvailability === false ? 'red' : '#30A952', padding: '2' }}
                               />
                             </Grid>
                             <Grid item>

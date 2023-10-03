@@ -140,7 +140,7 @@ export const requestAllWishlist = async (userId, wishlist) => {
     };
     return await axios.post(url, reqBody);
   } catch (error) {
-    console.error(error);
+    return error;
   }
 };
 
