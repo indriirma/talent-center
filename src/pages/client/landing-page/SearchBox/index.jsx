@@ -43,7 +43,7 @@ const SearchBox = () => {
           height: '48px',
           borderRadius: '36px',
         },
-        '@media (max-width: 500px)': {
+        '@media (max-width: 600px)': {
           width: '328px',
           height: '48px',
           borderRadius: '36px',
@@ -77,6 +77,9 @@ const SearchBox = () => {
               color: 'black',
               '& .MuiAutocomplete-endAdornment': {
                 display: 'none', // Hide the dropdown icon
+              },
+              '@media (max-width: 888px)': {
+                width: '400px',
               },
               '@media (max-width: 600px)': {
                 width: '245px',

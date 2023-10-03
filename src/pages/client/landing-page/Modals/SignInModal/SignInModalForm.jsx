@@ -8,9 +8,9 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import RegisterModalForm from '../RegisterModal/RegisterModalForm';
-import Cookies from 'js-cookie'; 
+import Cookies from 'js-cookie';
 
-const SignInModalForm = ({ signInOpen, signInClose }) => {
+const SignInModalForm = ({ signInOpen, signInClose, regOpen }) => {
   // const navigate = useNavigate();
 
   const validation = Yup.object().shape({
@@ -41,14 +41,14 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
           email: data.email,
           password: data.password,
         },
-        config                
+        config
       );
 
       if (response.status === 200) {
         // Sign in successful, handle the result as needed
         console.log('Sign in successful:', response.data);
-        Cookies.set("loginRequirement",JSON.stringify(response.data),{expires:7}); 
-        
+        Cookies.set('loginRequirement', JSON.stringify(response.data), { expires: 7 });
+
         // navigate('/client');
       } else {
         // Sign in failed, handle the error
@@ -59,7 +59,6 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
     }
   };
 
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState(signInOpen);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleShowPassword = () => {
@@ -69,21 +68,16 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
-  useEffect(() => {
-    setIsSignInModalOpen(signInOpen);
-  }, [signInOpen]);
-
-  const closeSignInModal = () => {
-    setIsSignInModalOpen(!signInOpen);
-    signInClose(!signInOpen);
+  const handleRegister = () => {
+    regOpen();
+    signInClose();
   };
 
   return (
-    isSignInModalOpen && (
-      <Dialog open={isSignInModalOpen} onClose={closeSignInModal} fullWidth maxWidth="xs" inputprops={{ style: { borderRadius: '10px' } }}>
+    signInOpen && (
+      <Dialog open={signInOpen} onClose={signInClose} fullWidth maxWidth="xs" inputprops={{ style: { borderRadius: '10px' } }}>
         <DialogTitle>
-          <IconButton onClick={closeSignInModal} style={{ float: 'right' }}>
+          <IconButton onClick={signInClose} style={{ float: 'right' }}>
             <CloseIcon color="primary"></CloseIcon>
           </IconButton>
           <Grid item>
@@ -120,7 +114,7 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
               </Grid>
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <TextField
-                  sx={{ width: 1, display: 'flex', pr: 1 }} 
+                  sx={{ width: 1, display: 'flex', pr: 1 }}
                   id="password"
                   size="small"
                   required
@@ -174,7 +168,7 @@ const SignInModalForm = ({ signInOpen, signInClose }) => {
               <Typography display="inline" variant="body1" fontFamily="Poppins">
                 <span style={{ textAlign: 'center', display: 'block', width: '100%' }}>
                   Don't have an account?{' '}
-                  <Link fontFamily="Poppins" display="inline" href=<RegisterModalForm />>
+                  <Link onClick={handleRegister} fontFamily="Poppins" display="inline">
                     Register Here
                   </Link>
                 </span>

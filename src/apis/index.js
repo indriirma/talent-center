@@ -61,6 +61,11 @@ export const fetchTalentList = async (currentPage, entries, sortBy, talentLevelI
   });
 };
 
+//API for Register
+export const fetchClientPosition = () => {
+  return axios.get(`${API_BASE_URL}/master-management/client-position-option-lists`);
+};
+
 //API for sidebar Mainpage
 export const fetchTalentLevel = () => {
   return axios.get(`${API_BASE_URL}/master-management/talent-level-option-lists`);
