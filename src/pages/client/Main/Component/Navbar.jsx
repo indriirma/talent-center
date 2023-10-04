@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
-import { AppBar, Box, Toolbar, IconButton, Typography, Container, Autocomplete, TextField, Divider, Paper } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SearchIcon from '@mui/icons-material/Search';
+import { useState } from 'react';
+import { AppBar, Box, Toolbar, IconButton, Typography, Container, List, ListItem, ListItemText, ListItemButton, Drawer } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -9,36 +7,29 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { fetchSearchTags } from 'apis';
+import Cookies from 'js-cookie';
+import { Close, Person } from '@mui/icons-material';
+import { SearchBox } from './SearchBox';
 
-function Navbar() {
-  const [list, setList] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [selectedOptions, setSelectedOptions] = useState([]);
+function Navbar({ onSearchClick, options, skillId, window }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleToggle = () => {
+    setIsDrawerOpen((prevState) => !prevState);
+  };
+
+  const dataArray = Cookies.get('loginRequirement');
+  const cookieData = JSON.parse(dataArray || '[]');
+  const username = cookieData.username;
+
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   const navigate = useNavigate();
 
   const navigateToWishlist = () => {
     navigate('/client/main/wishlist');
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchSearchTags(inputValue);
-        setList(response);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    if (inputValue) {
-      fetchData();
-    } else {
-      setList([]);
-    }
-  }, [inputValue]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,8 +39,13 @@ function Navbar() {
     setAnchorEl(null);
   };
 
+  const handleSignOut = () => {
+    Cookies.remove('loginRequirement');
+    navigate('/client');
+  };
+
   const navigateToMyRequest = () => {
-    //navigate('/my-request');
+    navigate('/client/main/request');
   };
 
   return (
@@ -95,160 +91,145 @@ function Navbar() {
           </Typography>
 
           {/* search box */}
-
-          <Paper
-            component="form"
-            sx={{
-              ml: 10,
-              width: '700px',
-              height: '40px',
-              backgroundColor: 'white',
-              borderRadius: '10px',
-              posision: 'absolute',
-              display: { xs: 'none', md: 'flex' },
-            }}
-          >
-            <Autocomplete
-              multiple
-              inputValue={inputValue}
-              data-testid="search-bar-element"
-              id="tags-standard"
-              options={list}
-              getOptionLabel={(option) => option.skillsetName}
-              onChange={(event, newValue) => {
-                setSelectedOptions(newValue); // Mengatur nilai terpilih saat opsi dipilih atau dihapus
-              }}
-              onInputChange={(event, newInputValue) => {
-                setInputValue(newInputValue);
-                setSelectedOptions([]); // Mengatur nilai terpilih menjadi kosong saat input berubah
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  InputProps={{ ...params.InputProps, disableUnderline: true }}
-                  variant="standard"
-                  placeholder={selectedOptions.length === 0 ? 'Try "JavaScript"' : ''}
-                  sx={{
-                    width: '600px',
-                    ml: 4,
-                    flex: 1,
-                    color: 'black',
-                    '& .MuiAutocomplete-endAdornment': {
-                      display: 'none', // Hide the dropdown icon
-                    },
-                    '@media (max-width: 400px)': {
-                      width: '205px',
-                    },
-                    // Vertically center the Autocomplete
-                    position: 'relative',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                  }}
-                />
-              )}
-              // PaperComponent={({ children }) => (
-              //   <Paper elevation={3} sx={{ backgroundColor: 'white', color: 'black' }}>
-              //     {children}
-              //   </Paper>
-              // )}
-            />
-            <IconButton type="button" sx={{ mr: 3, color: '#C4C4C4' }} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-          </Paper>
-
-          <IconButton
-            sx={{
-              width: '50px',
-              position: 'absolute',
-              right: 170,
-              color: 'white',
-              '@media (max-width: 600px)': {
-                right: 106,
-              },
-            }}
-          >
-            <BookmarkIcon onClick={navigateToWishlist} />
-          </IconButton>
-
-          <NotificationsIcon
-            sx={{
-              position: 'absolute',
-              right: 150,
-              '@media (max-width: 600px)': {
-                right: 65,
-              },
-            }}
-          />
-          <Divider
-            sx={{ color: 'white', height: 28, m: 0.5, position: 'absolute', right: 120, display: { xs: 'none', md: 'block' } }}
-            orientation="vertical"
-          />
-
-          {/* profile */}
-          <Box
-            sx={{
-              flexGrow: 0,
-              position: 'absolute',
-              right: 110,
-              '@media (max-width: 600px)': {
-                right: 10,
-              },
-            }}
-          >
-            <AccountCircleIcon sx={{ fontSize: '2rem' }} />
+          <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
+            <SearchBox onSearchClick={onSearchClick} options={options} skillId={skillId} />
           </Box>
-          <Typography
-            sx={{
-              fontFamily: 'Poppins',
-              fontWeight: 400,
-              position: 'absolute',
-              right: 50,
-              display: { xs: 'none', md: 'flex' },
-            }}
-          >
-            User
-          </Typography>
-          <ArrowDropDownIcon
-            aria-controls="dropdown-menu"
-            aria-haspopup="true"
-            onClick={handleClick}
-            sx={{ position: 'absolute', right: 90, display: { xs: 'none', md: 'flex' } }}
-          />
-          <Menu id="dropdown-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-            <MenuItem
-              sx={{
-                fontFamily: 'Inter',
-                fontSize: '14px',
-                fontWeight: 600,
-                lineHeight: '17px',
-                textAlign: 'left',
-              }}
-              onClick={handleClose}
-            >
-              <ListItemIcon onClick={navigateToMyRequest}>
-                <InboxIcon fontSize="small" />
-              </ListItemIcon>
-              My Request
-            </MenuItem>
-            <MenuItem
-              sx={{
-                fontFamily: 'Inter',
-                fontSize: '14px',
-                fontWeight: 600,
-                lineHeight: '17px',
-                textAlign: 'left',
-              }}
-              onClick={handleClose}
-            >
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" />
-              </ListItemIcon>
-              Sign Out
-            </MenuItem>
-          </Menu>
+
+          <Box sx={{ flexGrow: 1 }} />
+          <Box container sx={{ display: 'flex' }}>
+            <IconButton size="large" color="inherit">
+              <BookmarkIcon onClick={navigateToWishlist} />
+            </IconButton>
+            <IconButton size="large" color="inherit">
+              <NotificationsIcon />
+            </IconButton>
+            {/* <Divider sx={{ color: 'white', display: { xs: 'none', md: 'flex' } }} orientation="vertical" /> */}
+
+            {/* profile */}
+            <IconButton size="large" color="inherit" sx={{ display: { xs: 'none', md: 'flex' } }}>
+              <Person />
+              <Typography
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 400,
+                  fontSize: '9px',
+                  ml: '6px',
+                  display: { xs: 'none', md: 'flex' },
+                }}
+              >
+                {username}
+              </Typography>
+              <ArrowDropDownIcon
+                aria-controls="dropdown-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+                sx={{ position: 'absolute', right: 90, display: { xs: 'none', md: 'flex' } }}
+              />
+            </IconButton>
+            <IconButton onClick={handleToggle} size="large" color="inherit" sx={{ display: { xs: 'flex', md: 'none' } }}>
+              <Person />
+            </IconButton>
+            <Menu id="dropdown-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+              <MenuItem
+                sx={{
+                  fontFamily: 'Inter',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  lineHeight: '17px',
+                  textAlign: 'left',
+                }}
+                onClick={handleClose}
+              >
+                <ListItemIcon onClick={navigateToMyRequest}>
+                  <InboxIcon fontSize="small" />
+                </ListItemIcon>
+                My Request
+              </MenuItem>
+              <MenuItem
+                sx={{
+                  fontFamily: 'Inter',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  lineHeight: '17px',
+                  textAlign: 'left',
+                }}
+                onClick={handleClose}
+              >
+                <ListItemIcon onClick={handleSignOut}>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                Sign Out
+              </MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </Container>
+      <Box component="nav">
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={isDrawerOpen}
+          onClose={handleToggle}
+          anchor="right"
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { md: 'block', lg: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: 240,
+            },
+          }}
+        >
+          <Box
+            onClick={handleToggle}
+            sx={{
+              height: '100%',
+              bgcolor: '#2C8AD3',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '16px',
+              }}
+            >
+              <Close sx={{ alignSelf: 'flex-end' }} />
+            </div>
+            <List sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={navigateToMyRequest}
+                  sx={{ textAlign: 'center', color: 'white', textTransform: 'none', borderRadius: '25px' }}
+                >
+                  <ListItemIcon>
+                    <InboxIcon sx={{ color: 'white' }} fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText sx={{ fontFamily: 'Inter' }} primary={'My Request'} />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={handleSignOut}
+                  sx={{
+                    textAlign: 'center',
+                    color: 'white',
+                    textTransform: 'none',
+                    borderRadius: '25px',
+                  }}
+                >
+                  <ListItemIcon>
+                    <LogoutIcon sx={{ color: 'white' }} fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText sx={{ fontFamily: 'Poppins' }} primary={'Sign In'} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Box>
+        </Drawer>
+      </Box>
     </AppBar>
   );
 }

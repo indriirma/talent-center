@@ -47,7 +47,8 @@ const Main = () => {
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [selectedPositions, setSelectedPositions] = useState([]);
-  const [selectedSkillsets, setSelectedSkillsets] = useState([]);
+  const [selectedSearch, setSelectedSearch] = useState(state && state.selectedOptions ? state.selectedOptions : []);
+  const [selectedSkillsets, setSelectedSkillsets] = useState(state && state.skillsetIdArr ? state.skillsetIdArr : []);
   const [totalPage, setTotalPage] = useState(0);
   const [totalTalents, setTotalTalents] = useState(0);
   const [displayedTalents, setDisplayedTalents] = useState([]);
@@ -97,8 +98,8 @@ const Main = () => {
   const userId = cookieData.userId;
 
   useEffect(() => {
-    console.log(state);
     setIsLoading(true);
+    console.log(selectedSkillsets);
     fetchTalentList(currentPage, entriesPerPage, sortBy, sort, selectedLevels, selectedPositions, selectedExperience, selectedSkillsets)
       .then((response) => {
         console.log(response);
@@ -128,13 +129,17 @@ const Main = () => {
     setSuccessTitle(title);
     setSuccessDesc(description);
   };
+  const handleSearchClick = (newSkillset, value) => {
+    setSelectedSkillsets(newSkillset);
+    setSelectedSearch(value);
+  };
 
   return (
     <>
       <WarningAlert title={warnTitle} description={warnDescription} open={isWarning} close={handleCloseWarn} handleClick={navigateToSignIn} />
       <SuccessAlert title={successTitle} description={successDesc} open={isModalOpen} close={handleClosePopup} />
       <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
-        <Navbar />
+        <Navbar onSearchClick={handleSearchClick} options={selectedSearch} skillId={selectedSkillsets} />
         <Stack direction="row" sx={{ backgroundColor: 'white' }}>
           <Box sx={{ display: { xs: 'none', sm: 'block' }, py: 6, px: 4, boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.10)' }}>
             <SideBar
@@ -148,10 +153,10 @@ const Main = () => {
               handleSkillsetFilterChange={setSelectedSkillsets}
             />
           </Box>
-
           <Box flex={0} sx={{ flexGrow: 1, my: 4, mx: 3 }}>
             {/* filter Mobile */}
             <Stack direction="row" sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'space-between' }}>
+              {/* <SearchBox onSearchClick={handleSearchClick} options={selectedSearch} skillId={selectedSkillsets} /> */}
               <Button
                 variant="outlined"
                 startIcon={<FilterAltOutlined size={20} />}

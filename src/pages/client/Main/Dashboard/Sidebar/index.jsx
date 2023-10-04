@@ -73,6 +73,11 @@ const Sidebar = ({
     { id: 1, name: '1 Year of Experience' },
   ];
 
+  const handleSkillsetChange = (value) => {
+    handleSkillsetFilterChange([]);
+    handleSkillsetFilterChange(value);
+  };
+
   useEffect(() => {
     fetchTalentLevel()
       .then((response) => setLevels(response.data))
@@ -136,7 +141,7 @@ const Sidebar = ({
             idKey="skillsetId"
             nameKey="skillsetName"
             selectedItems={selectedSkillsets}
-            onChange={handleSkillsetFilterChange}
+            onChange={handleSkillsetChange}
           />
           {index !== skillsetTypeOptions.length - 1 && <Divider variant="middle" color="#DBDBDB" height="10" sx={{ mt: 3 }} />}
         </div>

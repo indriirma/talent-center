@@ -25,7 +25,7 @@ const SortTalent = ({ currentPage, talentsPerPage, totalTalents, onSortOptionCha
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <Typography sx={{ display: { xs: 'none', sm: 'flex' }, color: '#212121', fontFamily: 'Inter', lineHeight: 'normal' }} variant="body1">
+      <Typography sx={{ display: { xs: 'none', md: 'flex' }, color: '#212121', fontFamily: 'Inter', lineHeight: 'normal' }} variant="body1">
         Showing you {startIndex} - {endIndex} talents out of {totalTalents} total for matched talents
       </Typography>
 

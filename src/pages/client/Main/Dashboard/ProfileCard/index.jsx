@@ -23,9 +23,6 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
   const maxDisplayedItems = 2; // Ganti dengan jumlah item yang ingin ditampilkan
 
   const [inWishlist, setInWishlist] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertSeverity, setAlertSeverity] = useState('success');
 
   const navigate = useNavigate();
 
@@ -82,8 +79,6 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
       }}
       data-testid="talent-card"
     >
-      {/* <MainPageAlert open={alertOpen} onClose={() => setAlertOpen(false)} str={alertMessage} severity={alertSeverity} /> */}
-
       <Grid
         container
         sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', flexGrow: '1', width: 'auto', mx: '2rem', my: '1rem', minHeight: '200px' }}
@@ -228,11 +223,11 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
             <Button
               startIcon={<AddOutlined />}
               onClick={() => handleAddToList(talentDetail.talentId)}
-              disabled={inWishlist || !talentDetail.talentAvailability}
+              disabled={inWishlist || (talentDetail.talentAvailability === false ? true : false)}
               sx={{ textTransform: 'none', borderColor: '#2C8AD3', fontFamily: 'Inter' }}
               variant="outlined"
             >
-              {inWishlist || !talentDetail.talentAvailability ? 'In Wishlist' : 'Add to List'}
+              {inWishlist ? 'In Wishlist' : 'Add to List'}
             </Button>
             <Button
               endIcon={<KeyboardArrowRight />}
@@ -245,6 +240,7 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
         </Container>
         <Container sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end' }}>
           <Button
+            onClick={() => navigateToDetail(talentDetail?.talentId)}
             endIcon={<KeyboardArrowRight />}
             sx={{ textTransform: 'none', color: 'white', backgroundColor: '#2C8AD3', fontFamily: 'Inter', padding: '10px' }}
           >
