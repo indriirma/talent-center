@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AppBar, Box, Toolbar, IconButton, Typography, Container, List, ListItem, ListItemText, ListItemButton, Drawer } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { AppBar, Box, Toolbar, IconButton, Typography, Container, List, ListItem, ListItemText, ListItemButton, Drawer, Badge } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -11,7 +11,7 @@ import Cookies from 'js-cookie';
 import { Close, Person } from '@mui/icons-material';
 import { SearchBox } from './SearchBox';
 
-function Navbar({ onSearchClick, options, skillId, window }) {
+function Navbar({ onSearchClick, options, skillId, window, countWishlist }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -48,8 +48,12 @@ function Navbar({ onSearchClick, options, skillId, window }) {
     navigate('/client/main/request');
   };
 
+  useEffect(() => {
+    console.log(anchorEl);
+  }, [anchorEl]);
+
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#081E43', width: '100%' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#081E43' }}>
       <Container maxWidth="">
         <Toolbar disableGutters sx={{ height: { md: '100px', xs: '66px' } }}>
           <Link to="/client/main">
@@ -92,13 +96,23 @@ function Navbar({ onSearchClick, options, skillId, window }) {
 
           {/* search box */}
           <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
-            <SearchBox onSearchClick={onSearchClick} options={options} skillId={skillId} />
+            <SearchBox
+              onSearchClick={onSearchClick}
+              options={options}
+              skillId={skillId}
+              searchWidth="700px"
+              textWidth="600px"
+              marginSize={4}
+              paperMl={10}
+            />
           </Box>
 
           <Box sx={{ flexGrow: 1 }} />
           <Box container sx={{ display: 'flex' }}>
             <IconButton size="large" color="inherit">
-              <BookmarkIcon onClick={navigateToWishlist} />
+              <Badge badgeContent={countWishlist} color="error">
+                <BookmarkIcon onClick={navigateToWishlist} />
+              </Badge>
             </IconButton>
             <IconButton size="large" color="inherit">
               <NotificationsIcon />
@@ -106,7 +120,14 @@ function Navbar({ onSearchClick, options, skillId, window }) {
             {/* <Divider sx={{ color: 'white', display: { xs: 'none', md: 'flex' } }} orientation="vertical" /> */}
 
             {/* profile */}
-            <IconButton size="large" color="inherit" sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton
+              aria-controls="dropdown-menu"
+              aria-haspopup="true"
+              onClick={handleClick}
+              size="large"
+              color="inherit"
+              sx={{ display: { xs: 'none', md: 'flex' } }}
+            >
               <Person />
               <Typography
                 sx={{
@@ -119,12 +140,7 @@ function Navbar({ onSearchClick, options, skillId, window }) {
               >
                 {username}
               </Typography>
-              <ArrowDropDownIcon
-                aria-controls="dropdown-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-                sx={{ position: 'absolute', right: 90, display: { xs: 'none', md: 'flex' } }}
-              />
+              <ArrowDropDownIcon sx={{ display: { xs: 'none', md: 'flex' } }} />
             </IconButton>
             <IconButton onClick={handleToggle} size="large" color="inherit" sx={{ display: { xs: 'flex', md: 'none' } }}>
               <Person />
@@ -138,9 +154,12 @@ function Navbar({ onSearchClick, options, skillId, window }) {
                   lineHeight: '17px',
                   textAlign: 'left',
                 }}
-                onClick={handleClose}
+                onClick={() => {
+                  handleClose();
+                  navigateToMyRequest();
+                }}
               >
-                <ListItemIcon onClick={navigateToMyRequest}>
+                <ListItemIcon>
                   <InboxIcon fontSize="small" />
                 </ListItemIcon>
                 My Request
@@ -153,9 +172,12 @@ function Navbar({ onSearchClick, options, skillId, window }) {
                   lineHeight: '17px',
                   textAlign: 'left',
                 }}
-                onClick={handleClose}
+                onClick={() => {
+                  handleClose();
+                  handleSignOut();
+                }}
               >
-                <ListItemIcon onClick={handleSignOut}>
+                <ListItemIcon>
                   <LogoutIcon fontSize="small" />
                 </ListItemIcon>
                 Sign Out

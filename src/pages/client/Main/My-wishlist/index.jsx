@@ -29,6 +29,7 @@ const Wishlist = () => {
   const [handleWarn, setHandleWarn] = useState();
 
   const [selectedWishId, setSelectedWishId] = useState('');
+  const [countWishlist, setCountWishlist] = useState(0);
 
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
@@ -39,6 +40,8 @@ const Wishlist = () => {
       fetchWishlist(userId)
         .then((response) => {
           setTalentData(response.data);
+          const talentIdArr = response.data.map((item) => item.talentId);
+          setCountWishlist(talentIdArr.length);
         })
         .catch((error) => {
           console.error(error);
@@ -191,7 +194,7 @@ const Wishlist = () => {
         handleClick={handleWarnArr[handleWarn]}
       />
       <SuccessAlert title={successTitle} description={successDesc} open={isSuccessOpen} close={handleCloseSuccess} />
-      <Navbar />
+      <Navbar countWishlist={countWishlist} />
       {talentData.length !== 0 ? (
         <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
           <Container sx={{ my: '3rem' }}>

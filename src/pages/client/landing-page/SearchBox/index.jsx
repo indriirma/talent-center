@@ -5,7 +5,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { fetchSearchTags } from 'apis';
 import { useNavigate } from 'react-router-dom';
 
-const SearchBox = () => {
+const SearchBox = ({ selectedTag }) => {
   const [list, setList] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -27,6 +27,20 @@ const SearchBox = () => {
     };
     fetchData();
   }, [inputValue]);
+
+  useEffect(() => {
+    if (selectedTag.skillsetName !== undefined) {
+      console.log(selectedTag);
+      setSelectedOptions((prevSelectedOptions) => [...prevSelectedOptions, selectedTag]);
+      setInputValue(selectedTag.skillsetName);
+    }
+  }, [selectedTag]);
+
+  useEffect(() => {
+    console.log('selectedOptions has changed:', selectedOptions);
+    console.log('inputValue has changed:', inputValue);
+    console.log(list);
+  }, [selectedOptions, inputValue]);
 
   return (
     <Paper
@@ -58,11 +72,14 @@ const SearchBox = () => {
         options={list}
         getOptionLabel={(option) => option.skillsetName}
         onChange={(event, newValue) => {
-          setSelectedOptions(newValue); // set new value
+          setSelectedOptions(newValue);
         }}
         onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-          setSelectedOptions([]); // back to default
+          if (newInputValue) {
+            console.log('new input ', newInputValue);
+            setInputValue(newInputValue);
+            setSelectedOptions([]);
+          }
         }}
         renderInput={(params) => (
           <TextField

@@ -1,4 +1,4 @@
-import { Box, Container, Grid, IconButton, InputAdornment, TextField, Typography, Autocomplete, Button, styled, Stack } from '@mui/material';
+import { Box, Container, Grid, IconButton, InputAdornment, TextField, Typography, Autocomplete, Button, styled, Stack, Chip } from '@mui/material';
 import Navbar from './Modals';
 import { useState, useEffect } from 'react';
 import Footer from './Footer/Footerx';
@@ -37,6 +37,7 @@ const LandingPage = () => {
   const [index, setIndex] = useState(0);
   const [sentence, setSentence] = useState(sentences[index]);
   const [showTitle, setShowTitle] = useState(true);
+  const [selectedTag, setSelectedTag] = useState([]);
   useEffect(() => {
     const getPopularTags = async () => {
       try {
@@ -118,7 +119,7 @@ const LandingPage = () => {
             <Grid container direction="column">
               <Grid item justifyContent="center" marginBottom="10px" sx={{ display: 'flex' }}>
                 <Grid item>
-                  <SearchBox />
+                  <SearchBox selectedTag={selectedTag} />
                 </Grid>
               </Grid>
               <Grid marginBottom={30}>
@@ -151,9 +152,14 @@ const LandingPage = () => {
                       </Typography>
                       <Grid container sx={{ display: 'flex', gap: '10px', alignItems: 'center', flexDirection: 'row' }}>
                         {popularTags.map((skill, index) => (
-                          <PopularTags key={index} sx={{ marginBottom: '4px', gap: '3px' }}>
-                            {skill.skillsetName}
-                          </PopularTags>
+                          <Box
+                            key={index}
+                            onClick={() => {
+                              setSelectedTag({ skillsetId: skill.skillsetId, skillsetName: skill.skillsetName });
+                            }}
+                          >
+                            <PopularTags sx={{ marginBottom: '4px', gap: '3px', cursor: 'pointer' }}>{skill.skillsetName}</PopularTags>
+                          </Box>
                         ))}
                       </Grid>
                     </Stack>

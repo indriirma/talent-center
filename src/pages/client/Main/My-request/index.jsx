@@ -9,7 +9,7 @@ import { InfoOutlined } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert.jsx';
 import { useNavigate } from 'react-router-dom';
-import { fetchRequest } from 'apis/index.js';
+import { fetchRequest, fetchWishlist } from 'apis/index.js';
 
 const MyRequest = () => {
   const [tabValue, setTabValue] = useState('1');
@@ -24,6 +24,8 @@ const MyRequest = () => {
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [successTitle, setSuccessTitle] = useState('');
   const [successDesc, setSuccessDesc] = useState('');
+
+  const [countWishlist, setCountWishlist] = useState(0);
 
   const dataArray = Cookies.get('loginRequirement');
   const cookieData = JSON.parse(dataArray || '[]');
@@ -119,7 +121,7 @@ const MyRequest = () => {
       })
       .catch((error) => {
         console.error(error);
-        handleWarnAlert(error.response.status, error.response.message, null);
+        handleWarnAlert(error.response.data.status, error.response.data.message, null);
       });
   };
 
@@ -135,6 +137,16 @@ const MyRequest = () => {
       handleFetchReq(1, setApprovedReq);
       handleFetchReq(2, setRejectedReq);
       handleFetchReq(3, setOnProgReq);
+      fetchWishlist(userId)
+        .then((response) => {
+          if (response.status === 200) {
+            const talentIdArr = response.data.map((item) => item.talentId);
+            setCountWishlist(talentIdArr.length);
+          }
+        })
+        .catch((error) => {
+          handleWarnAlert(error.response.data.status, error.response.data.message, null);
+        });
     } else {
       warnLogin();
     }
@@ -163,7 +175,7 @@ const MyRequest = () => {
           setIsSuccessOpen(false);
         }}
       />
-      <Navbar />
+      <Navbar countWishlist={countWishlist} />
       <Box
         sx={{
           maxWidth: '100vw',

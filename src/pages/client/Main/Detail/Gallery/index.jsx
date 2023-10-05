@@ -1,4 +1,4 @@
-import { IconButton, Dialog } from '@mui/material';
+import { IconButton, Dialog, Box } from '@mui/material';
 import { CarouselComp } from '../Component';
 import { HighlightOff } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
@@ -48,17 +48,32 @@ export const Gallery = ({ medias, open, initialIndex, close }) => {
         '& .MuiDialog-paper': galleryStyle,
       }}
     >
-      <CarouselComp
-        medias={medias}
-        activeIndex={galActiveIndex}
-        prev={handlePrevious}
-        next={handleNext}
-        height={500}
-        width={500}
-        heightMedia="200px"
-        click={handleClick}
-        otherComp={<CloseIcon close={close} />}
-      />
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+        <CarouselComp
+          medias={medias}
+          activeIndex={galActiveIndex}
+          prev={handlePrevious}
+          next={handleNext}
+          height={500}
+          width={500}
+          heightMedia="200px"
+          click={handleClick}
+          otherComp={<CloseIcon close={close} />}
+        />
+      </Box>
+      <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+        <CarouselComp
+          medias={medias}
+          activeIndex={galActiveIndex}
+          prev={handlePrevious}
+          next={handleNext}
+          height={320}
+          width={320}
+          heightMedia="200px"
+          click={handleClick}
+          otherComp={<CloseIcon close={close} />}
+        />
+      </Box>
       {/* <Box
         sx={{
           display: 'flex',

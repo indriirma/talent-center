@@ -24,6 +24,8 @@ const Detail = () => {
   const [successDesc, setSuccessDesc] = useState('');
   const [warningTitle, setWarningTitle] = useState('');
   const [warningDesc, setWarningDesc] = useState('');
+
+  const [countWishlist, setCountWishlist] = useState(0);
   const [page, setPage] = useState('');
   const warnTitle = 'Access Forbidden!';
   const warnDescription = 'You should login first!';
@@ -75,6 +77,7 @@ const Detail = () => {
         if (response.status === 200) {
           const talentIdArr = response.data.map((item) => item.talentId);
           setIsWishlist(talentIdArr.includes(parseInt(id)));
+          setCountWishlist(talentIdArr.length);
         }
       })
       .catch((error) => {
@@ -186,7 +189,7 @@ const Detail = () => {
           setIsSuccessOpen(false);
         }}
       />
-      <Navbar />
+      <Navbar countWishlist={countWishlist} />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <Container sx={{ boxShadow: '0px 5px 20px 0px rgba(0,0,0,0.10)', borderRadius: '10px', paddingTop: '20px', paddingBottom: '20px' }}>
           <Grid container sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' } }}>
@@ -197,7 +200,7 @@ const Detail = () => {
                 <Button
                   sx={{ textTransform: 'capitalize', fontFamily: 'Inter', my: '0.5rem', width: '100%' }}
                   variant="contained"
-                  disabled={isWishlist ? true : false}
+                  disabled={isWishlist || (dataTalent.talentAvailability === false ? true : false)}
                   onClick={handleAddtoList}
                 >
                   {isWishlist ? 'In Wishlist' : 'Add to list'}

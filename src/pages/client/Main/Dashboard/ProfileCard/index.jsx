@@ -17,7 +17,7 @@ const TalentTag = ({ tagTitle }) => {
   );
 };
 
-const TalentCard = ({ talentDetail, open, warn, success }) => {
+const TalentCard = ({ talentDetail, open, warn, success, handleWishlist }) => {
   const totalPositions = talentDetail?.position?.length || 0;
   const totalSkills = talentDetail?.skillSet?.length || 0;
   const maxDisplayedItems = 2; // Ganti dengan jumlah item yang ingin ditampilkan
@@ -57,6 +57,7 @@ const TalentCard = ({ talentDetail, open, warn, success }) => {
       .then((response) => {
         const talentIds = response.data.map((item) => item.talentId);
         setInWishlist(talentIds.includes(talentDetail?.talentId));
+        handleWishlist(talentIds.length);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);

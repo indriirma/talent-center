@@ -3,7 +3,7 @@ import { Paper, Autocomplete, TextField, IconButton } from '@mui/material';
 import { fetchSearchTags } from 'apis';
 import { Search } from '@mui/icons-material';
 
-export const SearchBox = ({ onSearchClick, options, skillId }) => {
+export const SearchBox = ({ onSearchClick, options, skillId, searchWidth, textWidth, marginSize, paperMl }) => {
   const [list, setList] = useState([]);
   const [inputValue, setInputValue] = useState();
   const [selectedOptions, setSelectedOptions] = useState(skillId ? skillId : []);
@@ -34,12 +34,13 @@ export const SearchBox = ({ onSearchClick, options, skillId }) => {
     <Paper
       component="form"
       sx={{
-        ml: 10,
-        width: '700px',
-        height: '40px',
+        ml: paperMl,
+        width: searchWidth,
+        height: '50px',
         backgroundColor: 'white',
         borderRadius: '10px',
         display: 'flex',
+        // boxShadow: '0px 5px 20px 0px rgba(0, 0, 0, 0.10)',
       }}
     >
       <Autocomplete
@@ -64,8 +65,8 @@ export const SearchBox = ({ onSearchClick, options, skillId }) => {
             variant="standard"
             placeholder={selectedOptions.length === 0 ? 'Try "JavaScript"' : ''}
             sx={{
-              width: '600px',
-              ml: 4,
+              width: textWidth,
+              ml: marginSize,
               flex: 1,
               color: 'black',
               '& .MuiAutocomplete-endAdornment': {

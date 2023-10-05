@@ -3,12 +3,13 @@ import SideBar from './Sidebar';
 import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typography, Button, Drawer, LinearProgress } from '@mui/material';
 import SortYear from './SortYear';
 import ProfileCard from './ProfileCard';
-import { FilterAltOutlined, ArrowDropDownOutlined, Close } from '@mui/icons-material';
+import { FilterAltOutlined, ArrowDropDownOutlined, Close, StackedBarChartOutlined } from '@mui/icons-material';
 import { fetchTalentList } from 'apis';
 import Cookies from 'js-cookie';
 import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../Component/Navbar';
+import { SearchBox } from '../Component/SearchBox';
 
 const EntriesToggleButtonGroup = ({ value, onChange }) => {
   const entries = [10, 20, 50];
@@ -57,6 +58,7 @@ const Main = () => {
   const [isWarning, setIsWarning] = useState(false);
   const [successTitle, setSuccessTitle] = useState('');
   const [successDesc, setSuccessDesc] = useState('');
+  const [countWishlist, setCountWishlist] = useState(0);
   const warnTitle = 'Access Forbidden!';
   const warnDescription = 'You should login first!';
 
@@ -139,7 +141,7 @@ const Main = () => {
       <WarningAlert title={warnTitle} description={warnDescription} open={isWarning} close={handleCloseWarn} handleClick={navigateToSignIn} />
       <SuccessAlert title={successTitle} description={successDesc} open={isModalOpen} close={handleClosePopup} />
       <Box sx={{ maxWidth: '100vw', display: 'flex', flexDirection: 'column' }}>
-        <Navbar onSearchClick={handleSearchClick} options={selectedSearch} skillId={selectedSkillsets} />
+        <Navbar onSearchClick={handleSearchClick} options={selectedSearch} skillId={selectedSkillsets} countWishlist={countWishlist} />
         <Stack direction="row" sx={{ backgroundColor: 'white' }}>
           <Box sx={{ display: { xs: 'none', sm: 'block' }, py: 6, px: 4, boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.10)' }}>
             <SideBar
@@ -155,8 +157,18 @@ const Main = () => {
           </Box>
           <Box flex={0} sx={{ flexGrow: 1, my: 4, mx: 3 }}>
             {/* filter Mobile */}
+            <Stack direction="column" sx={{ display: { xs: 'flex', sm: 'none' }, mb: 2, justifyContent: 'center', alignItems: 'center', ml: 0 }}>
+              <SearchBox
+                onSearchClick={handleSearchClick}
+                options={selectedSearch}
+                skillId={selectedSkillsets}
+                searchWidth="300px"
+                textWidth="250px"
+                marginSize={2}
+                paperMl={0}
+              />
+            </Stack>
             <Stack direction="row" sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'space-between' }}>
-              {/* <SearchBox onSearchClick={handleSearchClick} options={selectedSearch} skillId={selectedSkillsets} /> */}
               <Button
                 variant="outlined"
                 startIcon={<FilterAltOutlined size={20} />}
@@ -166,7 +178,7 @@ const Main = () => {
                   display: 'flex',
                   borderRadius: '8px',
                   border: '1px solid var(--grey, #848484)',
-                  width: '170px',
+                  width: '150px',
                   textTransform: 'none',
                   color: 'black',
                 }}
@@ -218,7 +230,13 @@ const Main = () => {
                 <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
                   {displayedTalents.map((talent) => (
                     <Grid item xs={12} md={6} key={talent.talentId}>
-                      <ProfileCard talentDetail={talent} open={handleOpenPopup} warn={handleOpenWarn} success={handleSuccessText} />
+                      <ProfileCard
+                        talentDetail={talent}
+                        open={handleOpenPopup}
+                        warn={handleOpenWarn}
+                        success={handleSuccessText}
+                        handleWishlist={setCountWishlist}
+                      />
                     </Grid>
                   ))}
                 </Grid>
