@@ -12,7 +12,7 @@ const SearchBox = ({ selectedTag }) => {
   const navigate = useNavigate();
 
   const handleSearchClick = () => {
-    const skillsetIdArr = selectedOptions.map((item) => item.skillsetId).join(',');
+    const skillsetIdArr = selectedOptions.map((item) => item.skillsetId);
     navigate('main', { state: { skillsetIdArr, selectedOptions } });
   };
 

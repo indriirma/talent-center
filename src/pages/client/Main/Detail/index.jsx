@@ -72,19 +72,21 @@ const Detail = () => {
   };
 
   const updateWishlist = async (userId) => {
-    fetchWishlist(userId)
-      .then((response) => {
-        if (response.status === 200) {
-          const talentIdArr = response.data.map((item) => item.talentId);
-          setIsWishlist(talentIdArr.includes(parseInt(id)));
-          setCountWishlist(talentIdArr.length);
-        }
-      })
-      .catch((error) => {
-        handleWarningText(error.response.status, error.response.massage);
-        setPage('error');
-        setIsWarnOpen(true);
-      });
+    if (userId !== undefined) {
+      fetchWishlist(userId)
+        .then((response) => {
+          if (response.status === 200) {
+            const talentIdArr = response.data.map((item) => item.talentId);
+            setIsWishlist(talentIdArr.includes(parseInt(id)));
+            setCountWishlist(talentIdArr.length);
+          }
+        })
+        .catch((error) => {
+          handleWarningText(error.response.status, error.response.massage);
+          setPage('error');
+          setIsWarnOpen(true);
+        });
+    }
   };
 
   const fetchData = async () => {

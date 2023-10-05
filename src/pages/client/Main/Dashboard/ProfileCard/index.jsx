@@ -36,6 +36,7 @@ const TalentCard = ({ talentDetail, open, warn, success, handleWishlist }) => {
 
   const handleAddToList = async (talentId) => {
     try {
+      console.log('user id : ', userId);
       if (userId === undefined) {
         warn();
         return;

@@ -3,7 +3,7 @@ import SideBar from './Sidebar';
 import { Box, Stack, Grid, Pagination, ToggleButtonGroup, ToggleButton, Typography, Button, Drawer, LinearProgress } from '@mui/material';
 import SortYear from './SortYear';
 import ProfileCard from './ProfileCard';
-import { FilterAltOutlined, ArrowDropDownOutlined, Close, StackedBarChartOutlined } from '@mui/icons-material';
+import { FilterAltOutlined, ArrowDropDownOutlined, Close } from '@mui/icons-material';
 import { fetchTalentList } from 'apis';
 import Cookies from 'js-cookie';
 import { SuccessAlert, WarningAlert } from 'pages/component/PopupAlert';
@@ -104,6 +104,7 @@ const Main = () => {
     console.log(selectedSkillsets);
     fetchTalentList(currentPage, entriesPerPage, sortBy, sort, selectedLevels, selectedPositions, selectedExperience, selectedSkillsets)
       .then((response) => {
+        console.log('masuk ke main', state);
         console.log(response);
         setDisplayedTalents(response.data.content);
         setTotalTalents(response.data.totalElements);
@@ -111,6 +112,7 @@ const Main = () => {
       })
       .catch((error) => {
         // Handle error
+        console.log(error);
       })
       .finally(() => {
         setIsLoading(false); // Set loading to false when data fetching is done
@@ -135,6 +137,24 @@ const Main = () => {
     setSelectedSkillsets(newSkillset);
     setSelectedSearch(value);
   };
+
+  function removeStateWithoutNavigation() {
+    // Mendapatkan objek lokasi saat ini
+    const currentLocation = window.location;
+
+    // Membuat objek lokasi baru tanpa state
+    const newLocation = {
+      ...currentLocation,
+      state: null,
+    };
+
+    // Mengganti objek lokasi saat ini dengan objek yang baru
+    window.history.replaceState(newLocation.state, '', newLocation.pathname + newLocation.search);
+  }
+
+  useEffect(() => {
+    removeStateWithoutNavigation();
+  }, []);
 
   return (
     <>
