@@ -90,10 +90,12 @@ const RegisterModalForm = ({ regOpen, regClose, signInOpen }) => {
         },
         config
       );
-      if (response.status === 200) {
+      console.log('Data response : ', response);
+      if (response.data.status_code === 200) {
         const title = 'The data have been registered successfully!';
         const desc = '';
         handleSuccessAlert(title, desc);
+        // regClose();
       }
     } catch (error) {
       console.error('Error PAI : ', error.response);

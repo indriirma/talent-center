@@ -83,7 +83,7 @@ const SignInModalForm = ({ signInOpen, signInClose, regOpen }) => {
         message = 'Please register your email first';
       } else {
         message = title;
-        title = error.response.data.status;
+        title = error.response.data.status_code;
       }
       handleWarnAlert(title, message);
     }
